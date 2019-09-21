@@ -1,4 +1,4 @@
-package com.varlamovas.jsonserializer;
+package com.varlamovas.jsonserializer.tokens;
 
 public class StringToken implements TokenInterface {
 

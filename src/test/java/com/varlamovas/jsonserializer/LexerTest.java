@@ -1,5 +1,6 @@
 package com.varlamovas.jsonserializer;
 
+import com.varlamovas.jsonserializer.tokens.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -45,19 +46,19 @@ class LexerTest {
         assertEquals(Token.COLON, currentToken);
 
         currentToken = lexer.nextToken();
-        assertEquals(IntegerToken.class, currentToken.getClass());
+        assertEquals(NumberToken.class, currentToken.getClass());
     }
 
     // "42 4.2 4e2 4e+2 4e-2 -3 0 0"
     private static Stream<Arguments> provideStringsForNumberTokenChecks(){
         return Stream.of(
-                Arguments.of(" 42 ", IntegerToken.class, 42),
+                Arguments.of(" 42 ", NumberToken.class, 42),
                 Arguments.of(" 4.2 ", DoubleToken.class, 4.2),
                 Arguments.of(" 4e2 ", DoubleToken.class, 4e2),
                 Arguments.of(" 4e+2 ", DoubleToken.class, 4e+2),
                 Arguments.of(" 4e-2 ", DoubleToken.class, 4e-2),
-                Arguments.of(" -3 ", IntegerToken.class, -3),
-                Arguments.of(" 0 ", IntegerToken.class, 0)
+                Arguments.of(" -3 ", NumberToken.class, -3),
+                Arguments.of(" 0 ", NumberToken.class, 0)
         );
     }
 

@@ -1,4 +1,4 @@
-package com.varlamovas.jsonserializer;
+package com.varlamovas.jsonserializer.tokens;
 
 public enum BooleanToken implements TokenInterface {
     TRUE(true),
@@ -6,7 +6,7 @@ public enum BooleanToken implements TokenInterface {
 
     private final Boolean value;
 
-    private BooleanToken(boolean value){
+    BooleanToken(boolean value){
         this.value = value;
     }
 

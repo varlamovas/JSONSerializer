@@ -1,5 +1,6 @@
 package com.varlamovas.jsonserializer;
 
+import com.varlamovas.jsonserializer.readers.CharactersReader;
 import org.junit.jupiter.api.*;
 
 import java.io.Reader;
@@ -23,12 +24,6 @@ class CharactersReaderTest {
 
     @BeforeEach
     void setUpTest() {
-//        String pathToFile = Paths.get("").resolve( "src/test/resources/Test.json").toAbsolutePath().toString();
-//        try {
-//            reader = new FileReader(pathToFile);
-//        } catch (FileNotFoundException e) {
-//            e.printStackTrace();
-//        }
         reader = new StringReader("{\n  \"test\": 42\n}");
         charactersReader = new CharactersReader(reader);
         System.out.println("Before each test");
@@ -41,7 +36,6 @@ class CharactersReaderTest {
 
     @Test
     void readNext() {
-
         assertEquals("{", charactersReader.readNext());
         assertEquals("\n", charactersReader.readNext());
         assertEquals(" ", charactersReader.readNext());
@@ -79,10 +73,10 @@ class CharactersReaderTest {
     }
 
     @Test
-    void pick(){
-        assertEquals("{", charactersReader.pickNext());
-        assertEquals("{", charactersReader.pickNext());
-        assertEquals("{", charactersReader.pickNext());
-        assertEquals("{", charactersReader.pickNext());
+    void peek(){
+        assertEquals("{", charactersReader.peekNext());
+        assertEquals("{", charactersReader.peekNext());
+        assertEquals("{", charactersReader.peekNext());
+        assertEquals("{", charactersReader.peekNext());
     }
 }

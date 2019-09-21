@@ -1,4 +1,4 @@
-package com.varlamovas.jsonserializer;
+package com.varlamovas.jsonserializer.tokens;
 
 public enum Token implements TokenInterface {
     LEFT_CURLY_BRACE,

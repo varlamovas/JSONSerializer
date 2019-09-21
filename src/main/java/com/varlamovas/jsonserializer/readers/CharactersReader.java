@@ -1,10 +1,12 @@
-package com.varlamovas.jsonserializer;
+package com.varlamovas.jsonserializer.readers;
+
+import com.varlamovas.jsonserializer.MalformedJSONException;
 
 import java.io.IOException;
 import java.io.PushbackReader;
 import java.io.Reader;
 
-public class CharactersReader {
+public class CharactersReader implements CharacterReader{
 
     private static final int BUFFER_SIZE = 4;
 
@@ -33,7 +35,7 @@ public class CharactersReader {
         }
     }
 
-    public String pickNext() {
+    public String peekNext() {
         advance();
         if (eof) return null;
         Character ch = nextChar;

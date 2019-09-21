@@ -1,9 +1,14 @@
 package com.varlamovas.jsonserializer;
 
+import com.varlamovas.jsonserializer.readers.CharacterReader;
+import com.varlamovas.jsonserializer.readers.CharactersReaderAdapter;
+import com.varlamovas.jsonserializer.readers.CharactersReaderNew;
+import com.varlamovas.jsonserializer.tokens.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 
 import java.io.Reader;
+import java.io.StringReader;
 import java.util.*;
 
 public class Lexer {
@@ -19,7 +24,7 @@ public class Lexer {
         }
     };
 
-    private CharactersReader charactersReader;
+    private CharacterReader charactersReader;
     private Set<String> endedChars = new HashSet<String>() {
         {
             add(" ");
@@ -33,7 +38,7 @@ public class Lexer {
     };
 
     public Lexer(Reader reader) {
-        charactersReader = new CharactersReader(reader);
+        charactersReader = CharactersReaderAdapter.getReader(reader);
     }
 
     private TokenInterface readStringToken() {
@@ -52,27 +57,43 @@ public class Lexer {
         return new StringToken(resultString.toString());
     }
 
-    private TokenInterface validateNumberTokenFromString(String number) {
-        if (number.startsWith("0") && number.length() > 1) {
+    private TokenInterface validateNumberTokenFromString(String strNumber) {
+        if (strNumber.startsWith("0") && strNumber.length() > 1) {
             throw new MalformedJSONException("Invalid number");
         }
-        if (!NumberUtils.isCreatable(number)) {
+        if (!NumberUtils.isCreatable(strNumber)) {
             throw new MalformedJSONException("Invalid number");
         }
-        if (number.matches("-?\\d*[\\.eE][+-]?\\d+")) {
-            Double doubleNumber = NumberUtils.createDouble(number);
-            return new DoubleToken(doubleNumber);
+        if (strNumber.matches("-?\\d*\\.\\d*[eE]?[+-]?\\d*")) {
+            Number number = NumberUtils.createNumber(strNumber);
+            if (number instanceof Float) {
+                number = number.floatValue();
+            } else if (number instanceof Double) {
+                number = number.doubleValue();
+            }
+            return new DoubleToken(number);
         }
-        if (number.matches("-?\\d+")) {
-            Integer integerNumber = NumberUtils.createInteger(number);
-            return new IntegerToken(integerNumber);
+        if (strNumber.matches("-?\\d+")) {
+            Number number;
+            number = NumberUtils.createNumber(strNumber);
+            if (number instanceof Long) {
+                number = number.longValue();
+            }
+            else if (Byte.MIN_VALUE <= number.intValue() && number.intValue() <= Byte.MAX_VALUE) {
+                number = number.byteValue();
+            }
+            else if (Short.MIN_VALUE <= number.intValue() && number.intValue() <= Short.MAX_VALUE) {
+                number = number.shortValue();
+            }
+
+            return new NumberToken(number);
         }
         return null;
     }
 
     private TokenInterface readNumberToken(String firstCharacter) {
         StringBuilder resultNumber = new StringBuilder(firstCharacter);
-        while (!endedChars.contains(charactersReader.pickNext()) || charactersReader.pickNext() == null) {
+        while (!endedChars.contains(charactersReader.peekNext()) || charactersReader.peekNext() == null) {
             resultNumber.append(charactersReader.readNext());
         }
         return validateNumberTokenFromString(resultNumber.toString());
@@ -92,8 +113,8 @@ public class Lexer {
 
     private TokenInterface readBooleanToken(String firstCharacter) {
         StringBuilder resultBoolean = new StringBuilder(firstCharacter);
-        while (!endedChars.contains(charactersReader.pickNext())) {
-            if (charactersReader.pickNext() == null) {
+        while (!endedChars.contains(charactersReader.peekNext())) {
+            if (charactersReader.peekNext() == null) {
                 break;
             }
             resultBoolean.append(charactersReader.readNext());
@@ -110,7 +131,7 @@ public class Lexer {
 
     private TokenInterface readNullToken(String firstCharacter) {
         StringBuilder resultNull = new StringBuilder(firstCharacter);
-        while (!endedChars.contains(charactersReader.pickNext()) || charactersReader.pickNext() == null) {
+        while (!endedChars.contains(charactersReader.peekNext()) || charactersReader.peekNext() == null) {
             resultNull.append(charactersReader.readNext());
         }
         return validateNullToken(resultNull.toString());
