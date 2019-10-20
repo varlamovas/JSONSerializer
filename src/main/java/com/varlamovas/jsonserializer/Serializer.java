@@ -1,9 +1,7 @@
 package com.varlamovas.jsonserializer;
 
-import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.util.*;
-import java.util.stream.Stream;
 
 public class Serializer {
 

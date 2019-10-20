@@ -10,7 +10,6 @@ import java.util.stream.Stream;
 
 public class FieldRetriever {
 
-
     public static List<Field> getAllFields(Object obj) {
         Class<?> clazz = obj.getClass();
         return getAllFields(clazz);
@@ -20,6 +19,7 @@ public class FieldRetriever {
         List<Field> declaredFields = Arrays.stream(clazz.getDeclaredFields()).filter(f -> !Modifier.isStatic(f.getModifiers())).collect(Collectors.toList());
         List<Field> allSuperClassesFields = getAllSuperClassesFields(clazz);
         declaredFields.addAll(allSuperClassesFields);
+        declaredFields.forEach((field) -> field.setAccessible(true));
         return declaredFields;
     }
 

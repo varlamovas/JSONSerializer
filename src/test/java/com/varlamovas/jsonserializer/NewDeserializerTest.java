@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 
-public class DeserializerTest {
+public class NewDeserializerTest {
 
     static JsonSerializer jsonSerializer;
     static Gson gsonSerializer;
@@ -95,46 +95,5 @@ public class DeserializerTest {
         ClassWithListOfStringField deserialized = gsonSerializer.fromJson(json, ClassWithListOfStringField.class);
 
         assertIterableEquals(instance.listOfStrings, deserialized.listOfStrings);
-    }
-}
-
-class ClassSimple {
-
-    String stringField;
-    public void setStringField(String stringField) {
-        this.stringField = stringField;
-    }
-}
-
-class CustomClass {
-
-    String stringField;
-    byte byteField;
-    Byte byteFieldBoxed;
-    Short shortFieldBoxed;
-    Character charFieldBoxed;
-    Integer intFieldBoxed;
-    Long longFieldBoxed;
-    Float floatFieldBoxed;
-    Double doubleFieldBoxed;
-    Boolean booleanFieldBoxed;
-
-    public void setAllFIelds() {
-        stringField = "stringFieldValue";
-        byteField = 127;
-        byteFieldBoxed = 127;
-        shortFieldBoxed = 32767;
-        charFieldBoxed = 'c';
-        intFieldBoxed = 2147483647;
-        longFieldBoxed = 9223372036854775807L;
-        floatFieldBoxed = 3.4e+38f;
-        doubleFieldBoxed = 1.7e+308;
-        booleanFieldBoxed = true;
-    }
-
-    public static CustomClass getInstance() {
-        CustomClass instance = new CustomClass();
-        instance.setAllFIelds();
-        return instance;
     }
 }

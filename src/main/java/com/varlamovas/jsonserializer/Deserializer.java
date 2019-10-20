@@ -1,9 +1,9 @@
 package com.varlamovas.jsonserializer;
 
+import com.varlamovas.jsonserializer.seed.ObjectSeed;
+
 import java.io.Reader;
 import java.io.StringReader;
-import java.lang.reflect.Field;
-import java.util.List;
 
 public class Deserializer<T> {
 
@@ -17,8 +17,8 @@ public class Deserializer<T> {
 
     public T deserialize() {
         Reader stringReader = new StringReader(json);
-        Seed<T> seed = new Seed<>(klass);
-        Parser<T> parser = new Parser<>(stringReader, seed);
+        ObjectSeed<T> objectSeed = new ObjectSeed<>(klass);
+        Parser<T> parser = new Parser<>(stringReader, objectSeed);
         return parser.parseCommaSeparated();
     }
 }

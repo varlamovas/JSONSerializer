@@ -1,13 +1,17 @@
 package com.varlamovas.jsonserializer.adapters;
 
-public class StringAdapter implements BaseAdapter {
-    @Override
-    public void fromJson() {
+import com.varlamovas.jsonserializer.NewToken;
 
+public class StringAdapter implements BaseAdapter<String> {
+
+    @Override
+    public String fromJson(NewToken token) {
+        return token.getValue();
     }
 
     @Override
-    public void toJson() {
-
+    public String toJson(String value) {
+        return value;
     }
+
 }

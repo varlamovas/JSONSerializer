@@ -158,7 +158,7 @@ class ClassWithSetOfStringsField {
 }
 
 class ClassWithArrayListOfStringField {
-    ArrayList<String> listOfStrings;
+    List<String> listOfStrings;
 
     private void setListOfStrings() {
         listOfStrings = new ArrayList<>();

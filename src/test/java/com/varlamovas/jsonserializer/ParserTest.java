@@ -1,6 +1,7 @@
 package com.varlamovas.jsonserializer;
 
 import com.google.gson.Gson;
+import com.varlamovas.jsonserializer.seed.ObjectSeed;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -26,8 +27,8 @@ class ParserTest {
         String json = "{\"stringField\":\"stringFieldValue\",\"byteFieldBoxed\":127,\"shortFieldBoxed\":32767,\"charFieldBoxed\":\"c\",\"intFieldBoxed\":2147483647,\"longFieldBoxed\":9223372036854775807,\"floatFieldBoxed\":3.4E38,\"doubleFieldBoxed\":1.7E308,\"booleanFieldBoxed\":true}";
         Reader stringReader = new StringReader(json);
         CustomClassForSimpleParserTest initial = CustomClassForSimpleParserTest.getInstance();
-        Seed<CustomClassForSimpleParserTest> seed = new Seed<>(CustomClassForSimpleParserTest.class);
-        Parser<CustomClassForSimpleParserTest> parser = new Parser<>(stringReader, seed);
+        ObjectSeed<CustomClassForSimpleParserTest> objectSeed = new ObjectSeed<>(CustomClassForSimpleParserTest.class);
+        Parser<CustomClassForSimpleParserTest> parser = new Parser<>(stringReader, objectSeed);
         CustomClassForSimpleParserTest deserialized = parser.parseCommaSeparated();
         assertEquals(initial.stringField, deserialized.stringField);
         assertEquals(initial.byteFieldBoxed, deserialized.byteFieldBoxed);
