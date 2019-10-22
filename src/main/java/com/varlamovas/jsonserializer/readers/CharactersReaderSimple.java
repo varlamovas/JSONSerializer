@@ -1,20 +1,20 @@
 package com.varlamovas.jsonserializer.readers;
 
-import com.varlamovas.jsonserializer.MalformedJSONException;
+import com.varlamovas.jsonserializer.exceptions.MalformedJSONException;
 import com.varlamovas.jsonserializer.StringBuffer;
 
 import java.io.IOException;
 import java.io.StringReader;
 
-public class CharactersReaderNew implements CharacterReader {
+public class CharactersReaderSimple implements CharacterReader {
     private static final int BUFFER_SIZE = 4;
 
     private StringReader reader;
     private StringBuffer stringBuffer;
 
-    public CharactersReaderNew(StringReader reader) {
+    public CharactersReaderSimple(StringReader reader) {
         this.reader = reader;
-        stringBuffer = new StringBuffer(CharactersReaderNew.BUFFER_SIZE);
+        stringBuffer = new StringBuffer(CharactersReaderSimple.BUFFER_SIZE);
     }
 
     @Override

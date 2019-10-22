@@ -1,12 +1,16 @@
 package com.varlamovas.jsonserializer;
 
 import com.google.gson.Gson;
+import com.varlamovas.jsonserializer.testobjects.*;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import java.util.*;
+import java.lang.reflect.Field;
+import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -58,235 +62,31 @@ class SerializerTest {
         String actualResult = gsonSerializer.toJson(obj);
         assertEquals(expectedResult, actualResult);
     }
-}
 
-class ClassWithArrayOfIntegersField {
-    int[] arrayOfIntegersField = {1, 2, 3, 4};
-}
+    @Test
+    void fooTest() {
+        String serializedJson = JsonSerializer.serialize(new ST_withNullField());
+        String expectedJson = "{\"stringFieldNotNull\":\"stringFieldValue\"}";
+        assertEquals(expectedJson, serializedJson);
+    }
 
-class FooObject {
-    String stringField = "stringFieldValue";
-    String nullInsteadString = null;
-    byte byteField = 127;
-    short shortField = 32767;
-    char charField = 'c';
-    int intField = 2147483647;
-    long longField = 9223372036854775807L;
-    float floatField = 3.4e+38f;
-    double doubleField = 1.7e+308;
-    boolean booleanField = true;
-    Byte byteFieldBoxed = 127;
-    Short shortFieldBoxed = 32767;
-    Character charFieldBoxed = 'c';
-    Integer intFieldBoxed = 2147483647;
-    Long longFieldBoxed = 9223372036854775807L;
-    Float floatFieldBoxed = 3.4e+38f;
-    Double doubleFieldBoxed = 1.7e+308;
-    Boolean booleanFieldBoxed = true;
-//    int[] array = {1, 2, 3, 4};
-    List<Number> listOfNumbers = Arrays.asList(1, 2, 3, 4);
-    Map<String, String> mapOfStringToString = new HashMap<String, String>() {{
-        put("firstKey", "firstValue");
-        put("secondKey", "secondValue");
-    }};
-}
 
-class SimpleObject {
-    String field;
+    @Test
+    void fooTest1() throws IllegalAccessException {
+        ST_withNullField tmp = new ST_withNullField();
+        List<Field> fields = Arrays.asList(tmp.getClass().getDeclaredFields());
+        Field field = fields.get(0);
+        Object str = field.get(tmp);
+        field.getInt()
 
-    SimpleObject(String field) {
-        this.field = field;
     }
 }
 
-class ClassWithListOfSimpleObjects {
-    List<SimpleObject> listOfSimpleObjects = new ArrayList<>();
 
-    ClassWithListOfSimpleObjects() {
-        for (int i = 0; i < 10; ++i) {
-            listOfSimpleObjects.add(new SimpleObject("name" + i));
-        }
-    }
-}
+class ST_withNullField{
 
-class ClassWithMapOfStringToMapOfStringToNumber {
-    Map<String, Map<String, Number>> mapOfStringToMapOfStringToNumber = new HashMap<String, Map<String, Number>>() {
-        {
-            put("firstKey", new HashMap<String, Number>() {{
-                put("firstFirstKey", 1);
-                put("firstSecondKey", 2);
-            }});
-            put("secondKey", new HashMap<String, Number>() {{
-                put("secondFirstKey", 1);
-                put("secondSecondKey", 2);
-            }});
-        }
-    };
-}
+//    String stringFieldNotNull = "stringFieldValue";
+    String stringFieldNull = null;
+    int intField = 1;
 
-class ClassWithMapOfNumberToNumber {
-    Map<Number, Number> mapOfStringToString = new HashMap<Number, Number>() {
-        {
-            put(1, 1);
-            put(2, 2);
-        }
-    };
-}
-
-class ClassWithMapOfStringToString {
-    Map<String, String> mapOfStringToString = new HashMap<String, String>() {
-        {
-            put("firstKey", "firstValue");
-            put("secondKey", "secondValue");
-        }
-    };
-}
-
-class ClassWithQueueOfStringsField {
-    Queue<String> queueOfStrings = new ArrayDeque<>(Arrays.asList("queue", "Of", "Strings"));
-}
-
-class ClassWithListOfListOfStringsField {
-    List<List<String>> listOfListOfStrings = Arrays.asList(
-            Arrays.asList("first", "list", "Of", "Strings"),
-            Arrays.asList("second", "list", "Of", "Strings")
-    );
-}
-
-class ClassWithSetOfStringsField {
-    Set<String> setOfStrings = new HashSet<>(Arrays.asList("set", "Of", "Strings"));
-}
-
-class ClassWithArrayListOfStringField {
-    List<String> listOfStrings;
-
-    private void setListOfStrings() {
-        listOfStrings = new ArrayList<>();
-        listOfStrings.add("list");
-        listOfStrings.add("Of");
-        listOfStrings.add("Strings");
-    }
-
-    public static ClassWithArrayListOfStringField getInstance() {
-        ClassWithArrayListOfStringField inst = new ClassWithArrayListOfStringField();
-        inst.setListOfStrings();
-        return inst;
-    }
-
-}
-
-class ClassWithListOfStringField {
-    List<String> listOfStrings;
-
-    private void setListOfStrings() {
-        listOfStrings = Arrays.asList("list", "Of", "Strings");
-    }
-
-    public static ClassWithListOfStringField getInstance() {
-        ClassWithListOfStringField inst = new ClassWithListOfStringField();
-        inst.setListOfStrings();
-        return inst;
-    }
-
-}
-
-class ParentClassWithSetter {
-    String parentSettedString;
-
-    public void setParentSettedString(String str) {
-        parentSettedString = str;
-    }
-}
-
-class ChildrenClassWithSetter extends ParentClassWithSetter {
-    String childrenSettedString;
-
-    public void setChildrenSettedString(String str) {
-        childrenSettedString = str;
-    }
-
-    static ChildrenClassWithSetter getInstanceOfChildrenClassWithSetters() {
-        ChildrenClassWithSetter childrenClassWithSetter = new ChildrenClassWithSetter();
-        childrenClassWithSetter.setChildrenSettedString("childrenSettedStringValue");
-        childrenClassWithSetter.setParentSettedString("parentSettedStringValue");
-        return childrenClassWithSetter;
-    }
-}
-
-class ClassWithSetter {
-    String settedString;
-
-    public void setSettedString(String str) {
-        settedString = str;
-    }
-
-    static ClassWithSetter getInstanceOfClassWithSetters() {
-        ClassWithSetter classWithSetter = new ClassWithSetter();
-        classWithSetter.setSettedString("settedStringValue");
-        return classWithSetter;
-    }
-}
-
-class ClassOnlyWithPublicFields {
-    public String stringField = "stringFieldValue";
-    public int intField = 42;
-}
-
-class ClassOnlyWithPackagePrivateFields {
-    String stringField = "stringFieldValue";
-    int intField = 42;
-}
-
-class ClassOnlyWithProtectedFields {
-    protected String stringField = "stringFieldValue";
-    protected int intField = 42;
-}
-
-class ClassOnlyWithPrivateFields {
-    private String stringField = "stringFieldValue";
-    private int intField = 42;
-}
-
-class ClassOnlyWithFinalFields {
-    final String stringField = "stringFieldValue";
-    final int intField = 42;
-}
-
-class ClassOnlyWithStaticFields {
-    static String stringField = "stringFieldValue";
-    static int intField = 42;
-}
-
-class Parent {
-    public String parentPublicString = "parentPublicStringValue";
-    String parentPackagePrivateString = "parentPackagePrivateStringValue";
-    protected String parentProtectedString = "parentProtectedStringValue";
-    private String parentPrivateString = "parentPrivateStringValue";
-
-    final public String finalParentPublicString = "finalParentPublicString";
-    final String finalParentPackagePrivateString = "finalParentPackagePrivateString";
-    final protected String finalParentProtectedString = "finalParentProtectedString";
-    final private String finalParentPrivateString = "finalParentPrivateString";
-
-    static public String staticParentPublicString = "staticParentPublicString";
-    static String staticParentPackagePrivateString = "staticParentPackagePrivateString";
-    static protected String staticParentProtectedString = "staticParentProtectedString";
-    static private String staticParentPrivateString = "staticParentPrivateString";
-}
-
-class Children extends Parent {
-    public String childrenPublicString = "childrenPublicStringValue";
-    String childrenPackagePrivateString = "childrenPackagePrivateStringValue";
-    protected String childrenProtectedString = "childrenProtectedStringValue";
-    private String childrenPrivateString = "childrenPrivateStringValue";
-
-    final public String finalChildrenPublicString = "finalChildrenPublicString";
-    final String finalChildrenPackagePrivateString = "finalChildrenPackagePrivateString";
-    final protected String finalChildrenProtectedString = "finalChildrenProtectedString";
-    final private String finalChildrenPrivateString = "finalChildrenPrivateString";
-
-    static public String staticChildrenPublicString = "staticChildrenPublicString";
-    static String staticChildrenPackagePrivateString = "staticChildrenPackagePrivateString";
-    static protected String staticChildrenProtectedString = "staticChildrenProtectedString";
-    static private String staticChildrenPrivateString = "staticChildrenPrivateString";
 }

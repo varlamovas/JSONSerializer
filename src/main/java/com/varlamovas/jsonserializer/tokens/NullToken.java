@@ -1,10 +1,10 @@
 package com.varlamovas.jsonserializer.tokens;
 
-public enum NullToken implements TokenInterface {
-    NULL;
+public class NullToken extends ValueToken {
 
-    @Override
-    public Object getValue() {
-        return null;
+    public static final ValueToken NULL = new NullToken("null");
+
+    private NullToken(String value) {
+        super(value);
     }
 }

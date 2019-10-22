@@ -1,14 +1,15 @@
 package com.varlamovas.jsonserializer;
 
+import com.varlamovas.jsonserializer.exceptions.MalformedJSONException;
+import com.varlamovas.jsonserializer.readers.CharacterReader;
 import com.varlamovas.jsonserializer.seed.ObjectSeed;
+import com.varlamovas.jsonserializer.tokens.*;
+import com.varlamovas.jsonserializer.tokens.ValueToken;
 import com.varlamovas.jsonserializer.tokens.Token;
-import com.varlamovas.jsonserializer.tokens.TokenInterface;
 
-import java.io.Reader;
-import java.io.StringReader;
-import java.lang.reflect.*;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.lang.reflect.Field;
+import java.util.List;
+import java.util.function.Consumer;
 
 public class Parser<T> {
 
@@ -16,165 +17,67 @@ public class Parser<T> {
     private List<Field> listOfFields;
     private ObjectSeed<T> objectSeed;
 
-    Parser(Reader reader, ObjectSeed<T> objectSeed) {
-        lexer = new Lexer((StringReader) reader);
+    public Parser(CharacterReader reader, ObjectSeed<T> objectSeed) {
+        lexer = new Lexer(reader);
         this.objectSeed = objectSeed;
         this.listOfFields = objectSeed.getAllFields();
     }
 
-    public T parseCommaSeparated() {
+    private void expect(Token token) {
+        if (lexer.nextToken() != token) throw new IllegalArgumentException();
+    }
 
-        assert Token.LEFT_CURLY_BRACE == lexer.nextToken();
-        T instance = objectSeed.newInstance();
+    public void parseCommaSeparated(Token stopToken, Consumer<Token> body) {
+        boolean expectComma = false;
         while (true) {
-            TokenInterface<?> propertyToken = lexer.nextToken();
-            if (propertyToken == Token.RIGHT_CURLY_BRACE) break;
-            assert Token.COLON == lexer.nextToken();
-            assert listOfFields.stream().anyMatch(f -> f.getName().equals(propertyToken.getValue()));
-            TokenInterface<?> valueToken = lexer.nextToken();
+            Token token = lexer.nextToken();
+            if (token == stopToken) return;
+            if (expectComma) {
+                if (token != MarkToken.COMMA) throw new MalformedJSONException("Expect comma");
+                token = lexer.nextToken();
+            }
 
-            List<Field> fields = objectSeed.getAllFields().stream().filter(f -> f.getName().equals(propertyToken.getValue())).collect(Collectors.toList());
-            assert !fields.isEmpty();
-            Field field = fields.get(0);
+            body.accept(token);
 
-            //  deserialized string field
-            if (field.getType().equals(String.class)) {
-                try {
-                    field.set(instance, valueToken.getValue());
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                }
-            }
-            //  deserialized <? extends Number> field
-            else if (Number.class.isAssignableFrom(field.getType())) {
-                try {
-                    field.set(instance, field.getType().cast(valueToken.getValue()));
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                }
-            }
-            // Character type
-            else if (field.getType().equals(Character.class)) {
-                try {
-                    field.set(instance, ((String) valueToken.getValue()).charAt(0));
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                }
-            }
-            // Boolean type
-            else if (field.getType().equals(Boolean.class)) {
-                try {
-                    field.set(instance, valueToken.getValue());
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                }
-            }
-            //collection
-            else if (Collection.class.isAssignableFrom(field.getType()) && valueToken.equals(Token.LEFT_SQUARE_BRACKET)) {
-
-                Collection<?> collection = null;
-                while (true) {
-//                    TokenInterface<?> token = lexer.nextToken();
-                    Type type = field.getGenericType();
-                    ParameterizedType pType = null;
-                    Method add = null;
-                    Constructor<?> constructor = null;
-                    if (pType == null && type instanceof ParameterizedType) {
-                        pType = (ParameterizedType) type;
-                        try {
-                            if (field.getType().isInterface()) {
-                                collection = new ArrayList<>();
-                            } else {
-                                collection = (Collection) field.getType().newInstance();
-                            }
-                        } catch (InstantiationException e) {
-                            e.printStackTrace();
-                        } catch (IllegalAccessException e) {
-                            e.printStackTrace();
-                        }
-                        try {
-                            add = field.getType().getMethod("add", Object.class);
-                        } catch (NoSuchMethodException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    while (true) {
-                        TokenInterface<?> tk = lexer.nextToken();
-                        if (tk.equals(Token.COMMA)) continue;
-                        if (tk.equals(Token.RIGHT_SQUARE_BRACKET)) break;
-//                        if ()
-                        try {
-                            add.invoke(collection, tk.getValue());
-                        } catch (IllegalAccessException e) {
-                            e.printStackTrace();
-                        } catch (InvocationTargetException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    ;
-                    break;
-                }
-                try {
-                    field.set(instance, collection);
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                }
-            }
-            // map
-            else if (Map.class.isAssignableFrom(field.getType()) && valueToken.equals(Token.LEFT_CURLY_BRACE)) {
-                Map<?, ?> map = null;
-                while (true) {
-//                    TokenInterface<?> token = lexer.nextToken();
-                    Type type = field.getGenericType();
-                    ParameterizedType pType = null;
-                    Method put = null;
-                    if (pType == null && type instanceof ParameterizedType) {
-                        pType = (ParameterizedType) type;
-                        try {
-                            if (field.getType().isInterface()) {
-                                map = new HashMap<>();
-                            } else {
-                                map = (Map) field.getType().newInstance();
-                            }
-                        } catch (InstantiationException e) {
-                            e.printStackTrace();
-                        } catch (IllegalAccessException e) {
-                            e.printStackTrace();
-                        }
-                        try {
-                            put = field.getType().getMethod("put", Object.class, Object.class);
-                        } catch (NoSuchMethodException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    while (true) {
-                        TokenInterface<?> key = lexer.nextToken();
-                        if (key.equals(Token.COMMA)) continue;
-                        if (key.equals(Token.RIGHT_CURLY_BRACE)) break;
-                        assert lexer.nextToken() == Token.COLON;
-                        TokenInterface<?> value = lexer.nextToken();
-//                        if ()
-                        try {
-                            put.invoke(map, key.getValue(), value.getValue());
-                        } catch (IllegalAccessException e) {
-                            e.printStackTrace();
-                        } catch (InvocationTargetException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    ;
-                    break;
-                }
-                try {
-                    field.set(instance, map);
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                }
-            }
-            TokenInterface<?> next = lexer.nextToken();
-            assert next.equals(Token.COMMA) || next.equals(Token.RIGHT_CURLY_BRACE);
-            if (next.equals(Token.RIGHT_CURLY_BRACE)) break;
+            expectComma = true;
         }
-        return instance;
+    }
+
+    public void parseArrayBody(ObjectSeed objSeed, String propName) {
+        parseCommaSeparated(MarkToken.RIGHT_SQUARE_BRACKET, (token) -> {
+            parsePropertyValue(objSeed, propName, token);
+        });
+    }
+
+    public void parsePropertyValue(ObjectSeed objectSeed, String propertyName, Token token) {
+        if (token instanceof ValueToken) {
+            objectSeed.addProperty(propertyName, token);
+        }
+//        if (token.equals(MarkToken.LEFT_SQUARE_BRACKET)) {
+//            ObjectSeed newArrayObj = objectSeed.createNewArrayObject(propertyName);
+//            parseArrayBody(newArrayObj, propertyName);
+//        }
+//        if (token.equals(MarkToken.LEFT_CURLY_BRACE)) {
+//            ObjectSeed newObj = objectSeed.createNewObject(propertyName);
+//            parseObjectBody(newObj);
+//        }
+    }
+
+    public void parseObjectBody(ObjectSeed objectSeed) {
+        parseCommaSeparated(MarkToken.RIGHT_CURLY_BRACE, (token) -> {
+            if (!(token instanceof StringToken)) {
+                throw new MalformedJSONException("unexpected Token");
+            }
+            String propName = token.getValue();
+            expect(MarkToken.COLON);
+            parsePropertyValue(objectSeed, propName, lexer.nextToken());
+        });
+    }
+
+    public void parse() {
+        expect(MarkToken.LEFT_CURLY_BRACE);
+        parseObjectBody(objectSeed);
+        if (lexer.nextToken() != null) throw new MalformedJSONException("Too many tokens");
     }
 }
+

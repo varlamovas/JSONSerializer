@@ -14,7 +14,6 @@ class FieldRetrieverTest {
     void testGetAllSuperClasses(){
         DeepChildren deepChildren = new DeepChildren();
         List<Class> listOfSuperClasses = FieldRetriever.getAllSuperClasses(deepChildren.getClass());
-//        System.out.println(listOfSuperClasses.toString());
         assertEquals("[class com.varlamovas.jsonserializer.ParentFour, class com.varlamovas.jsonserializer.ParentThree, class com.varlamovas.jsonserializer.ParentTwo, class com.varlamovas.jsonserializer.ParentOne]",
                 listOfSuperClasses.toString());
     }

@@ -1,6 +1,6 @@
 package com.varlamovas.jsonserializer;
 
-import com.varlamovas.jsonserializer.readers.CharactersReaderNew;
+import com.varlamovas.jsonserializer.readers.CharactersReaderSimple;
 import org.junit.jupiter.api.*;
 
 import java.io.StringReader;
@@ -8,14 +8,14 @@ import java.io.StringReader;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-class CharactersReaderNewTest {
+class CharactersReaderSimpleTest {
 
-    private static CharactersReaderNew charactersReader;
+    private static CharactersReaderSimple charactersReader;
 
     @BeforeEach
     void setUpTest() {
         StringReader reader = new StringReader("{\n  \"test\": 42\n}");
-        charactersReader = new CharactersReaderNew(reader);
+        charactersReader = new CharactersReaderSimple(reader);
         System.out.println("Before each test");
     }
 

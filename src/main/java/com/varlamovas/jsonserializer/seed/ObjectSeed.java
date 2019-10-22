@@ -1,8 +1,8 @@
 package com.varlamovas.jsonserializer.seed;
 
 import com.varlamovas.jsonserializer.FieldRetriever;
-import com.varlamovas.jsonserializer.MalformedJSONException;
-import com.varlamovas.jsonserializer.NewToken;
+import com.varlamovas.jsonserializer.exceptions.MalformedJSONException;
+import com.varlamovas.jsonserializer.tokens.Token;
 import com.varlamovas.jsonserializer.adapters.BaseAdapter;
 import com.varlamovas.jsonserializer.adapters.StringAdapter;
 
@@ -67,7 +67,7 @@ public class ObjectSeed<T> extends BaseSeed{
         return new ObjectSeed(clazz);
     }
 
-    public void addProperty(String propertyName, NewToken token) {
+    public void addProperty(String propertyName, Token token) {
         BaseAdapter<?> adapter = new StringAdapter();
         Object obj = adapter.fromJson(token);
         propMap.put(propertyName, obj);

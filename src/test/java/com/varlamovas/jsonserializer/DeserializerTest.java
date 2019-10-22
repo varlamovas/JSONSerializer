@@ -1,6 +1,7 @@
 package com.varlamovas.jsonserializer;
 
 import com.google.gson.Gson;
+import com.varlamovas.jsonserializer.testobjects.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -22,7 +23,6 @@ public class DeserializerTest {
     void deserializeWithJsonserializer() {
         CustomClass fooObject = CustomClass.getInstance();
         String json = jsonSerializer.serialize(fooObject);
-        System.out.println(json);
         CustomClass deserializedFooObject = jsonSerializer.deserialize(json, CustomClass.class);
         assertEquals(fooObject.stringField, deserializedFooObject.stringField);
         assertEquals(fooObject.byteFieldBoxed, deserializedFooObject.byteFieldBoxed);
@@ -39,7 +39,6 @@ public class DeserializerTest {
     void deserializeWithGSON() {
         CustomClass fooObject = CustomClass.getInstance();
         String json = gsonSerializer.toJson(fooObject);
-        System.out.println(json);
         CustomClass deserializedFooObject = gsonSerializer.fromJson(json, CustomClass.class);
         assertEquals(fooObject.stringField, deserializedFooObject.stringField);
         assertEquals(fooObject.byteFieldBoxed, deserializedFooObject.byteFieldBoxed);
@@ -95,46 +94,5 @@ public class DeserializerTest {
         ClassWithListOfStringField deserialized = gsonSerializer.fromJson(json, ClassWithListOfStringField.class);
 
         assertIterableEquals(instance.listOfStrings, deserialized.listOfStrings);
-    }
-}
-
-class ClassSimple {
-
-    String stringField;
-    public void setStringField(String stringField) {
-        this.stringField = stringField;
-    }
-}
-
-class CustomClass {
-
-    String stringField;
-    byte byteField;
-    Byte byteFieldBoxed;
-    Short shortFieldBoxed;
-    Character charFieldBoxed;
-    Integer intFieldBoxed;
-    Long longFieldBoxed;
-    Float floatFieldBoxed;
-    Double doubleFieldBoxed;
-    Boolean booleanFieldBoxed;
-
-    public void setAllFIelds() {
-        stringField = "stringFieldValue";
-        byteField = 127;
-        byteFieldBoxed = 127;
-        shortFieldBoxed = 32767;
-        charFieldBoxed = 'c';
-        intFieldBoxed = 2147483647;
-        longFieldBoxed = 9223372036854775807L;
-        floatFieldBoxed = 3.4e+38f;
-        doubleFieldBoxed = 1.7e+308;
-        booleanFieldBoxed = true;
-    }
-
-    public static CustomClass getInstance() {
-        CustomClass instance = new CustomClass();
-        instance.setAllFIelds();
-        return instance;
     }
 }

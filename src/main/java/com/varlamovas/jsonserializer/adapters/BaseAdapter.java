@@ -1,8 +1,8 @@
 package com.varlamovas.jsonserializer.adapters;
 
-import com.varlamovas.jsonserializer.NewToken;
+import com.varlamovas.jsonserializer.tokens.Token;
 
 public interface BaseAdapter<T> {
-    T fromJson(NewToken token);
+    T fromJson(Token token);
     String toJson(T value);
 }

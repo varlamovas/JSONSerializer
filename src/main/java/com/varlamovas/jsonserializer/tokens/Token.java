@@ -1,16 +1,14 @@
 package com.varlamovas.jsonserializer.tokens;
 
-public enum Token implements TokenInterface {
-    LEFT_CURLY_BRACE,
-    RIGHT_CURLY_BRACE,
-    LEFT_SQUARE_BRACKET,
-    RIGHT_SQUARE_BRACKET,
-    COLON,
-    COMMA,
-    ;
+public abstract class Token {
 
-    @Override
-    public String getValue() {
-        return null;
+    private final String value;
+
+    public Token(String value) {
+        this.value = value;
     }
-}
+
+    public String getValue() {
+        return value;
+    }
+};

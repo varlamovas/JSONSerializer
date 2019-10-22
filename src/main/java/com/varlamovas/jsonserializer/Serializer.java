@@ -1,7 +1,13 @@
 package com.varlamovas.jsonserializer;
 
+import com.varlamovas.jsonserializer.adapters.AdapterFactory;
+import com.varlamovas.jsonserializer.adapters.BaseAdapter;
+
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 public class Serializer {
 
@@ -15,37 +21,37 @@ public class Serializer {
 
     public String serialize() {
 
-        jsonBuilder.append("{");
-
-        List<Field> allFields = FieldRetriever.getAllFields(obj);
-        String processedFields = processDeclaredFields(allFields, obj);
-
-        jsonBuilder.append(processedFields);
-        jsonBuilder.append("}");
+        parseObject(obj);
         return jsonBuilder.toString();
     }
 
-    public String processDeclaredFields(List<Field> declaredFields, Object obj) {
-        List<String> processedFields = new ArrayList<>();
-        for (Field field : declaredFields) {
-            if (!field.isAccessible()) {
-                field.setAccessible(true);
-            }
-            String parsedField = parseField(field, obj);
-            if (!parsedField.isEmpty()) {
-                processedFields.add(parsedField);
-            }
-        }
-        return String.join(",", processedFields);
+
+    public void parseObject(Object obj) {
+        jsonBuilder.append("{");
+
+        List<Field> allFields = FieldRetriever.getAllFields(obj);
+        processDeclaredFields(allFields, obj);
+
+        jsonBuilder.append("}");
     }
 
-    public String parseField(Field field, Object obj) {
-        StringBuilder fieldAsString = new StringBuilder();
-        fieldAsString.append("\"");
-        fieldAsString.append(field.getName());
-        fieldAsString.append("\"");
-        fieldAsString.append(":");
-        Class clazz = field.getType();
+    public void processDeclaredFields(List<Field> declaredFields, Object obj) {
+        boolean parsedField = false;
+        boolean expectColon = false;
+        for (Field field : declaredFields) {
+            if (parsedField) {
+                if (expectColon) jsonBuilder.append(",");
+            }
+            parsedField = parseField(field, obj);
+            expectColon = true;
+        }
+    }
+
+    public boolean parseField(Field field, Object obj) {
+//        jsonBuilder.append("\"");
+//        jsonBuilder.append(field.getName());
+//        jsonBuilder.append("\"");
+//        jsonBuilder.append(":");
         Object fieldObject = null;
         try {
             fieldObject = field.get(obj);
@@ -53,32 +59,30 @@ public class Serializer {
             e.printStackTrace();
         }
         if (fieldObject != null) {
-            fieldAsString.append(parseItem(fieldObject));
-            return fieldAsString.toString();
+            parseItem(fieldObject);
+            return true;
         } else {
-            return "";
+            return false;
         }
     }
 
-    public String parseItem(Object item) {
-        StringBuilder itemAsString = new StringBuilder();
+    public void parseItem(Object item) {
         Class clazz = item.getClass();
-        if (item instanceof String) {
-            itemAsString.append(parseStringType(item));
-        } else if (clazz.isPrimitive() || item instanceof Number) {
-            itemAsString.append(parsePrimitiveType(item));
-        } else if (Collection.class.isAssignableFrom(clazz)) {
-            itemAsString.append(parseCollectionType(item));
-        } else if (Map.class.isAssignableFrom(clazz)) {
-            itemAsString.append(parseMapType(item));
-        } else if (item instanceof Character) {
-            itemAsString.append( parseCharacter(item) );
-        } else if (item instanceof Boolean) {
-            itemAsString.append(parseBooleanType(item));
-        } else {
-            itemAsString.append(new Serializer(item).serialize());
+        if (Collection.class.isAssignableFrom(clazz)) {
+            parseCollectionType(item);
+            return;
         }
-        return itemAsString.toString();
+        if (Map.class.isAssignableFrom(clazz)) {
+            parseMapType(item);
+            return;
+        }
+        BaseAdapter adapter = AdapterFactory.getAdapter(item, clazz);
+        if (adapter != null) {
+            jsonBuilder.append(adapter.toJson(item));
+        } else {
+            parseObject(item);
+        }
+
     }
 
     private String parseArrayType(Object arrayTypeObject) {
@@ -87,51 +91,36 @@ public class Serializer {
         return "";
     }
 
-    private String parseBooleanType(Object booleanTypeObject) {
-        assert booleanTypeObject instanceof Boolean;
-        return booleanTypeObject.toString();
-    }
 
-    private String parseCharacter(Object characterTypeObject) {
-        assert characterTypeObject instanceof Character;
-        return "\"" + characterTypeObject.toString() + "\"";
-    }
-
-    public String parseMapType(Object mapTypeObject) {
-        StringBuilder mapAsString = new StringBuilder();
-        mapAsString.append("{");
+    public void parseMapType(Object mapTypeObject) {
+        jsonBuilder.append("{");
         Map<Object, Object> map = (Map<Object, Object>) mapTypeObject;
-        List<String> mapInnerObjectsAsListOfStrings = new ArrayList<>();
-        String keyValueString;
+        boolean expectColon = false;
         for (Map.Entry<Object, Object> entry : map.entrySet()) {
-            keyValueString = parseStringType(entry.getKey().toString()) + ":" + parseItem(entry.getValue());
-            mapInnerObjectsAsListOfStrings.add(keyValueString);
+            if (expectColon) jsonBuilder.append(",");
+            parseStringType(entry.getKey().toString());
+            jsonBuilder.append(":");
+            parseItem(entry.getValue());
+            expectColon = true;
         }
-        mapAsString.append(String.join(",", mapInnerObjectsAsListOfStrings))
-                .append("}");
-        return mapAsString.toString();
+        jsonBuilder.append("}");
     }
 
-    public String parseCollectionType(Object collectionTypeObject) {
-        StringBuilder collectionAsString = new StringBuilder();
-        collectionAsString.append("[");
+    public void parseCollectionType(Object collectionTypeObject) {
+        jsonBuilder.append("[");
+        boolean expectColon = false;
         Collection<Object> collection = (Collection<Object>) collectionTypeObject;
-        List<String> collectionInnerObjectsAsListOfStrings = new ArrayList<>();
         for (Object collectionInnerObject : collection) {
-            collectionInnerObjectsAsListOfStrings.add(parseItem(collectionInnerObject));
+            if (expectColon) jsonBuilder.append(",");
+            parseItem(collectionInnerObject);
+            expectColon = true;
         }
-        collectionAsString.append(String.join(",", collectionInnerObjectsAsListOfStrings));
-        collectionAsString.append("]");
-        return collectionAsString.toString();
+        jsonBuilder.append("]");
     }
 
-    String parsePrimitiveType(Object primitiveTypeObject) {
-        return primitiveTypeObject.toString();
-    }
-
-    String parseStringType(Object stringTypeObject) {
+    void parseStringType(Object stringTypeObject) {
         assert stringTypeObject instanceof String;
-        return "\"" + stringTypeObject.toString() + "\"";
+        jsonBuilder.append("\"" + stringTypeObject.toString() + "\"");
     }
 
 }

@@ -1,30 +1,28 @@
 package com.varlamovas.jsonserializer;
 
+import com.varlamovas.jsonserializer.exceptions.MalformedJSONException;
 import com.varlamovas.jsonserializer.readers.CharacterReader;
-import com.varlamovas.jsonserializer.readers.CharactersReaderAdapter;
-import com.varlamovas.jsonserializer.readers.CharactersReaderNew;
 import com.varlamovas.jsonserializer.tokens.*;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
 
-import java.io.Reader;
-import java.io.StringReader;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class Lexer {
 
+    private CharacterReader reader;
     private Map<String, Token> tokenMap = new HashMap<String, Token>() {
         {
-            put("{", Token.LEFT_CURLY_BRACE);
-            put("}", Token.RIGHT_CURLY_BRACE);
-            put("[", Token.LEFT_SQUARE_BRACKET);
-            put("]", Token.RIGHT_SQUARE_BRACKET);
-            put(":", Token.COLON);
-            put(",", Token.COMMA);
+            put("{", MarkToken.LEFT_CURLY_BRACE);
+            put("}", MarkToken.RIGHT_CURLY_BRACE);
+            put("[", MarkToken.LEFT_SQUARE_BRACKET);
+            put("]", MarkToken.RIGHT_SQUARE_BRACKET);
+            put(":", MarkToken.COLON);
+            put(",", MarkToken.COMMA);
         }
     };
 
-    private CharacterReader charactersReader;
     private Set<String> endedChars = new HashSet<String>() {
         {
             add(" ");
@@ -37,15 +35,73 @@ public class Lexer {
         }
     };
 
-    public Lexer(Reader reader) {
-        charactersReader = CharactersReaderAdapter.getReader(reader);
+    Lexer(CharacterReader reader) {
+        this.reader = reader;
     }
 
-    private TokenInterface readStringToken() {
+    public Token nextToken() {
+        String character;
+        do {
+            character = reader.readNext();
+        } while (StringUtils.isWhitespace(character));
+        if (character == null) return null;
+        if (tokenMap.containsKey(character)) return tokenMap.get(character);
+        if (character.equals("\"")) return readStringToken();
+        if (StringUtils.isNumber(character) || character.equals("-")) return readNumberToken(character);
+        if (character.matches("[tf]")) return readBooleanToken(character);
+        if (character.matches("n")) return readNullToken(character);
+        return null;
+    }
+
+    public Token readNullToken(String initialCharacter) {
+        String resultBool = readLexeme(initialCharacter).toString();
+        if (resultBool.equals(NullToken.NULL.getValue())) {
+            return NullToken.NULL;
+        }
+        throw new MalformedJSONException("invalid syntax");
+    }
+
+    public Token readBooleanToken(String character) {
+        String resultBool = readLexeme(character).toString();
+        if (resultBool.equals(BooleanToken.TRUE.getValue())) {
+            return BooleanToken.TRUE;
+        } else if (resultBool.equals(BooleanToken.FALSE.getValue())) {
+            return BooleanToken.FALSE;
+        }
+        throw new MalformedJSONException("Invalid syntax");
+    }
+
+    public StringBuilder readLexeme(String initialCharacter) {
+        StringBuilder resultString = new StringBuilder(initialCharacter);
+        while (!endedChars.contains(reader.peekNext()) && reader.peekNext() != null) {
+            resultString.append(reader.readNext());
+        }
+        return resultString;
+    }
+
+    public Token readNumberToken(String character) {
+        String resultNumber = readLexeme(character).toString();
+        if (resultNumber.startsWith("0") && resultNumber.length() > 1) {
+            //TODO: think about it exception
+            throw new MalformedJSONException("Invalid number");
+        }
+//        if (resultNumber.matches("-?\\d+(\\.\\d*)?[eE]?[+-]?\\d*")) {
+//        if (resultNumber.matches("-?\\d+(\\.\\d*)?[eE]?[+-]?\\d*")) {
+        if (resultNumber.matches("-?\\d+")) {
+            return new IntegerToken(resultNumber);
+        }
+        if (resultNumber.matches("-?\\d+\\.\\d+") || resultNumber.matches("-?\\d+[eE][+-]?\\d+") || resultNumber.matches("-?\\d+(\\.\\d*)?[eE]?[+-]?\\d*")) {
+            return new FloatToken(resultNumber);
+        }
+        // TODO: think about it exception
+        throw new MalformedJSONException("invalid syntax");
+    }
+
+    public Token readStringToken() {
         StringBuilder resultString = new StringBuilder();
         String c;
         while (true) {
-            c = charactersReader.readNext();
+            c = reader.readNext();
             if (c == null) throw new MalformedJSONException("Unterminated string");
             if (c.equals("\"")) break;
             if (c.equals("\\")) {
@@ -57,98 +113,5 @@ public class Lexer {
         return new StringToken(resultString.toString());
     }
 
-    private TokenInterface validateNumberTokenFromString(String strNumber) {
-        if (strNumber.startsWith("0") && strNumber.length() > 1) {
-            throw new MalformedJSONException("Invalid number");
-        }
-        if (!NumberUtils.isCreatable(strNumber)) {
-            throw new MalformedJSONException("Invalid number");
-        }
-        if (strNumber.matches("-?\\d*\\.\\d*[eE]?[+-]?\\d*")) {
-            Number number = NumberUtils.createNumber(strNumber);
-            if (number instanceof Float) {
-                number = number.floatValue();
-            } else if (number instanceof Double) {
-                number = number.doubleValue();
-            }
-            return new DoubleToken(number);
-        }
-        if (strNumber.matches("-?\\d+")) {
-            Number number;
-            number = NumberUtils.createNumber(strNumber);
-            if (number instanceof Long) {
-                number = number.longValue();
-            }
-            else if (Byte.MIN_VALUE <= number.intValue() && number.intValue() <= Byte.MAX_VALUE) {
-                number = number.byteValue();
-            }
-            else if (Short.MIN_VALUE <= number.intValue() && number.intValue() <= Short.MAX_VALUE) {
-                number = number.shortValue();
-            }
-
-            return new NumberToken(number);
-        }
-        return null;
-    }
-
-    private TokenInterface readNumberToken(String firstCharacter) {
-        StringBuilder resultNumber = new StringBuilder(firstCharacter);
-        while (!endedChars.contains(charactersReader.peekNext()) || charactersReader.peekNext() == null) {
-            resultNumber.append(charactersReader.readNext());
-        }
-        return validateNumberTokenFromString(resultNumber.toString());
-    }
-
-    private TokenInterface validateBooleanToken(String bool) {
-        if (bool == null) {
-            throw new MalformedJSONException("Invalid syntax");
-        }
-        if (bool.matches("true")) {
-            return BooleanToken.TRUE;
-        } else if (bool.matches("false")){
-            return BooleanToken.FALSE;
-        }
-        throw new MalformedJSONException("Invalid syntax");
-    }
-
-    private TokenInterface readBooleanToken(String firstCharacter) {
-        StringBuilder resultBoolean = new StringBuilder(firstCharacter);
-        while (!endedChars.contains(charactersReader.peekNext())) {
-            if (charactersReader.peekNext() == null) {
-                break;
-            }
-            resultBoolean.append(charactersReader.readNext());
-        }
-        return validateBooleanToken(resultBoolean.toString());
-    }
-
-    private TokenInterface validateNullToken(String nul) {
-        if (nul.matches("null")) {
-            return NullToken.NULL;
-        }
-        throw new MalformedJSONException("Invalid syntax");
-    }
-
-    private TokenInterface readNullToken(String firstCharacter) {
-        StringBuilder resultNull = new StringBuilder(firstCharacter);
-        while (!endedChars.contains(charactersReader.peekNext()) || charactersReader.peekNext() == null) {
-            resultNull.append(charactersReader.readNext());
-        }
-        return validateNullToken(resultNull.toString());
-    }
-
-    public TokenInterface nextToken() {
-        String character;
-        do {
-            character = charactersReader.readNext();
-        } while (StringUtils.isWhitespace(character));
-        if (character == null) return null;
-        if (tokenMap.containsKey(character)) return tokenMap.get(character);
-        if (character.equals("\"")) return readStringToken();
-        if (StringUtils.isNumeric(character) || character.equals("-")) return readNumberToken(character);
-        if (character.matches("[tf]")) return readBooleanToken(character);
-        if (character.matches("n")) return readNullToken(character);
-        return null;
-    }
 
 }

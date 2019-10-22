@@ -1,6 +1,7 @@
 package com.varlamovas.jsonserializer;
 
 import com.varlamovas.jsonserializer.seed.ObjectSeed;
+import com.varlamovas.jsonserializer.testobjects.ClassSimple;
 import org.junit.jupiter.api.Test;
 
 class ObjectSeedTest {

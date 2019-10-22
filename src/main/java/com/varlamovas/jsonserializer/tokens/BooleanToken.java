@@ -1,17 +1,11 @@
 package com.varlamovas.jsonserializer.tokens;
 
-public enum BooleanToken implements TokenInterface {
-    TRUE(true),
-    FALSE(false);
+public class BooleanToken extends ValueToken {
 
-    private final Boolean value;
+    public static final ValueToken TRUE = new BooleanToken("true");
+    public static final ValueToken FALSE = new BooleanToken("false");
 
-    BooleanToken(boolean value){
-        this.value = value;
-    }
-
-    @Override
-    public Boolean getValue() {
-        return value;
+    private BooleanToken(String value) {
+        super(value);
     }
 }

@@ -1,4 +1,4 @@
-package com.varlamovas.jsonserializer;
+package com.varlamovas.jsonserializer.exceptions;
 
 public class MalformedJSONException extends RuntimeException {
     public MalformedJSONException(String message) {
