@@ -4,8 +4,7 @@ import com.varlamovas.jsonserializer.FieldRetriever;
 import com.varlamovas.jsonserializer.adapters.AdapterFactory;
 import com.varlamovas.jsonserializer.exceptions.MalformedJSONException;
 import com.varlamovas.jsonserializer.tokens.Token;
-import com.varlamovas.jsonserializer.adapters.BaseAdapter;
-import com.varlamovas.jsonserializer.adapters.StringAdapter;
+import com.varlamovas.jsonserializer.adapters.ObjectAdapter;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
@@ -69,7 +68,7 @@ public class ObjectSeed<T> extends BaseSeed{
     }
 
     public void addProperty(String propertyName, Token token) {
-        BaseAdapter adapter = AdapterFactory.getAdapter(null, null);
+        ObjectAdapter adapter = AdapterFactory.getAdapter(null);
         Object obj = null;
 //        Object obj = adapter.fromJson(token);
         propMap.put(propertyName, obj);

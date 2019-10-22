@@ -1,8 +1,8 @@
 package com.varlamovas.jsonserializer.adapters;
 
-import com.varlamovas.jsonserializer.tokens.Token;
+import com.varlamovas.jsonserializer.StringUtils;
 
-public class CharacterAdapter implements BaseAdapter {
+public class CharacterAdapter implements ObjectAdapter {
 //    @Override
 //    public Object fromJson(Token token) {
 //        return null;
@@ -10,6 +10,6 @@ public class CharacterAdapter implements BaseAdapter {
 
     @Override
     public String toJson(Object value) {
-        return "\"" + value.toString() + "\"";
+        return StringUtils.wrapByQuotes(value.toString());
     }
 }

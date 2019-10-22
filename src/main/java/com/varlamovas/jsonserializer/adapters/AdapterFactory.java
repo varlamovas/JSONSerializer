@@ -1,28 +1,31 @@
 package com.varlamovas.jsonserializer.adapters;
 
-import java.lang.reflect.Field;
-import java.util.HashMap;
+import com.varlamovas.jsonserializer.FieldRetriever;
 
 public class AdapterFactory {
 
-    private static final BaseAdapter STRING_ADAPTER = new StringAdapter();
+    private static final ObjectAdapter STRING_ADAPTER = new StringAdapter();
+    private static final ObjectAdapter NUMBER_ADAPTER = new NumberAdapter();
+    private static final ObjectAdapter CHARACTER_ADAPTER = new CharacterAdapter();
+    private static final ObjectAdapter BOOLEAN_ADAPTER = new BooleanTypeAdapter();
+    private static final ObjectAdapter NULL_ADAPTER = new NullAdapter();
+    private static final PrimitiveAdapter PRIMITIVE_ADAPTER = new PrimitiveAdapter();
 
-
-    public static BaseAdapter getAdapter(Object object, Class<?> clazz) {
+    public static ObjectAdapter getAdapter(Object object) {
         if (object instanceof String) {
-//            parseStringType(object);
             return STRING_ADAPTER;
-        } else if (clazz.isPrimitive() || object instanceof Number) {
-//            parsePrimitiveType(object);
-            return new PrimitiveTypeAdapter();
+        } else if (object instanceof Number) {
+            return NUMBER_ADAPTER;
         } else if (object instanceof Character) {
-//            parseCharacter(object);
-            return new CharacterAdapter();
+            return CHARACTER_ADAPTER;
         } else if (object instanceof Boolean) {
-//            parseBooleanType(object);
-            return new BooleanTypeAdapter();
+            return BOOLEAN_ADAPTER;
         } else if (object == null) {
-            return new NullAdapter();
-        } else return null;
+            return NULL_ADAPTER;}
+        else return null;
+    }
+
+    public static PrimitiveAdapter getPrimitiveAdapter() {
+        return PRIMITIVE_ADAPTER;
     }
 }

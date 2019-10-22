@@ -11,4 +11,12 @@ public class ClassWithListOfSimpleObjects implements BaseObject {
             listOfSimpleObjects.add(new SimpleObject("name" + i));
         }
     }
+
+    public static ClassWithListOfSimpleObjects getInstance() {
+        return new ClassWithListOfSimpleObjects();
+    }
+
+    public static String toJson() {
+        return "{\"listOfSimpleObjects\":[{\"field\":\"name0\"},{\"field\":\"name1\"},{\"field\":\"name2\"},{\"field\":\"name3\"},{\"field\":\"name4\"},{\"field\":\"name5\"},{\"field\":\"name6\"},{\"field\":\"name7\"},{\"field\":\"name8\"},{\"field\":\"name9\"}]}";
+    }
 }

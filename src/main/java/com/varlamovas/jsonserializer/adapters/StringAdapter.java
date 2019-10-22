@@ -2,9 +2,7 @@ package com.varlamovas.jsonserializer.adapters;
 
 import com.varlamovas.jsonserializer.StringUtils;
 
-import java.lang.reflect.Field;
-
-public class StringAdapter implements BaseAdapter {
+public class StringAdapter implements ObjectAdapter {
 
 
     StringAdapter() {}
@@ -16,20 +14,7 @@ public class StringAdapter implements BaseAdapter {
 
     @Override
     public String toJson(Object stringValue) {
-        return "\"" + stringValue.toString() + "\"";
+        return StringUtils.wrapByQuotes(stringValue.toString());
     }
 
-
-    @Override
-    public String toJson(Field objectField, Object instanceWithField) {
-        Object objectByField = null;
-        String jsonRepr;
-        try {
-            objectByField = objectField.get(instanceWithField);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
-        jsonRepr = (String) objectByField;
-        return StringUtils.wrapByQuotes(jsonRepr);
-    }
 }

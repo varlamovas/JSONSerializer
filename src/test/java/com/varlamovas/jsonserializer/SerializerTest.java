@@ -9,6 +9,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
@@ -38,8 +39,9 @@ class SerializerTest {
                 Arguments.of(new ClassWithMapOfStringToString(), "{\"mapOfStringToString\":{\"firstKey\":\"firstValue\",\"secondKey\":\"secondValue\"}}"),
                 Arguments.of(new ClassWithMapOfNumberToNumber(), "{\"mapOfStringToString\":{\"1\":1,\"2\":2}}"),
                 Arguments.of(new ClassWithMapOfStringToMapOfStringToNumber(), "{\"mapOfStringToMapOfStringToNumber\":{\"firstKey\":{\"firstFirstKey\":1,\"firstSecondKey\":2},\"secondKey\":{\"secondSecondKey\":2,\"secondFirstKey\":1}}}"),
-                Arguments.of(new FooObject(), "{\"stringField\":\"stringFieldValue\",\"byteField\":127,\"shortField\":32767,\"charField\":\"c\",\"intField\":2147483647,\"longField\":9223372036854775807,\"floatField\":3.4E38,\"doubleField\":1.7E308,\"booleanField\":true,\"byteFieldBoxed\":127,\"shortFieldBoxed\":32767,\"charFieldBoxed\":\"c\",\"intFieldBoxed\":2147483647,\"longFieldBoxed\":9223372036854775807,\"floatFieldBoxed\":3.4E38,\"doubleFieldBoxed\":1.7E308,\"booleanFieldBoxed\":true,\"listOfNumbers\":[1,2,3,4],\"mapOfStringToString\":{\"firstKey\":\"firstValue\",\"secondKey\":\"secondValue\"}}"),
-                Arguments.of(new ClassWithListOfSimpleObjects(), "{\"listOfSimpleObjects\":[{\"field\":\"name0\"},{\"field\":\"name1\"},{\"field\":\"name2\"},{\"field\":\"name3\"},{\"field\":\"name4\"},{\"field\":\"name5\"},{\"field\":\"name6\"},{\"field\":\"name7\"},{\"field\":\"name8\"},{\"field\":\"name9\"}]}")
+                Arguments.of(new FooObject(), "{\"stringField\":\"stringFieldValue\",\"byteField\":127,\"shortField\":32767,\"charField\":\"c\",\"intField\":2147483647,\"longField\":9223372036854775807,\"floatField\":3.4E38,\"doubleField\":1.7E308,\"booleanField\":true,\"byteFieldBoxed\":127,\"shortFieldBoxed\":32767,\"charFieldBoxed\":\"c\",\"intFieldBoxed\":2147483647,\"longFieldBoxed\":9223372036854775807,\"floatFieldBoxed\":3.4E38,\"doubleFieldBoxed\":1.7E308,\"booleanFieldBoxed\":true,\"arrayInt\":[1,2,3,4],\"arrayString\":[\"one\",\"two\",\"three\"],\"listOfNumbers\":[1,2,3,4],\"mapOfStringToString\":{\"firstKey\":\"firstValue\",\"secondKey\":\"secondValue\"}}"),
+                Arguments.of(ClassWithListOfSimpleObjects.getInstance(), ClassWithListOfSimpleObjects.toJson()),
+                Arguments.of(ClassWithArrayOfIntegersField.getInstance(), ClassWithArrayOfIntegersField.toJson())
         );
     }
 
@@ -62,32 +64,5 @@ class SerializerTest {
         String actualResult = gsonSerializer.toJson(obj);
         assertEquals(expectedResult, actualResult);
     }
-
-    @Test
-    void fooTest() {
-        String serializedJson = JsonSerializer.serialize(new ST_withNullField());
-        String expectedJson = "{\"stringFieldNotNull\":\"stringFieldValue\",\"stringFieldNotNull2\":\"stringFieldValue\"}";
-        assertEquals(expectedJson, serializedJson);
-    }
-
-
-    @Test
-    void fooTest1() throws IllegalAccessException {
-        ST_withNullField tmp = new ST_withNullField();
-        List<Field> fields = Arrays.asList(tmp.getClass().getDeclaredFields());
-        Field field = fields.get(0);
-        Object str = field.get(tmp);
-//        field.getInt()
-
-    }
-}
-
-
-class ST_withNullField{
-
-    String stringFieldNotNull = "stringFieldValue";
-    String stringFieldNull = null;
-    String stringFieldNotNull2 = "stringFieldValue";
-//    int intField = 1;
 
 }

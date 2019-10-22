@@ -1,6 +1,7 @@
 package com.varlamovas.jsonserializer.testobjects;
 
 public class Children extends Parent implements BaseObject {
+
     public String childrenPublicString = "childrenPublicStringValue";
     String childrenPackagePrivateString = "childrenPackagePrivateStringValue";
     protected String childrenProtectedString = "childrenProtectedStringValue";

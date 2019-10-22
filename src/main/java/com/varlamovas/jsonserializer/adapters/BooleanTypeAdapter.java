@@ -1,8 +1,6 @@
 package com.varlamovas.jsonserializer.adapters;
 
-import com.varlamovas.jsonserializer.tokens.Token;
-
-public class BooleanTypeAdapter implements BaseAdapter {
+public class BooleanTypeAdapter implements ObjectAdapter {
 //    @Override
 //    public Object fromJson(Token token) {
 //        return null;

@@ -1,5 +1,7 @@
 package com.varlamovas.jsonserializer;
 
+import com.varlamovas.jsonserializer.exceptions.FieldRetrieveException;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -43,5 +45,16 @@ public class FieldRetriever {
             superClasses.add(currentClass);
         }
         return superClasses;
+    }
+
+    public static Object getFieldObject(Field field, Object objectWithField) {
+        Object instance = null;
+        try {
+            instance = field.get(objectWithField);
+        } catch (IllegalAccessException e) {
+            //TODO: need to clarify exception and message
+            throw new FieldRetrieveException();
+        }
+        return instance;
     }
 }
