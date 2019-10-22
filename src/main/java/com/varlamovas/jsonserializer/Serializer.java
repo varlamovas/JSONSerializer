@@ -4,7 +4,6 @@ import com.varlamovas.jsonserializer.adapters.AdapterFactory;
 import com.varlamovas.jsonserializer.adapters.BaseAdapter;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -13,6 +12,7 @@ public class Serializer {
 
     private Object obj;
     private StringBuilder jsonBuilder;
+    private boolean expectColon = false;
 
     public Serializer(Object obj) {
         this.obj = obj;
@@ -36,34 +36,34 @@ public class Serializer {
     }
 
     public void processDeclaredFields(List<Field> declaredFields, Object obj) {
-        boolean parsedField = false;
-        boolean expectColon = false;
+        expectColon = false;
         for (Field field : declaredFields) {
-            if (parsedField) {
-                if (expectColon) jsonBuilder.append(",");
-            }
-            parsedField = parseField(field, obj);
+
+            if (expectColon) jsonBuilder.append(",");
+
             expectColon = true;
+            parsePropertyValue(field, obj);
         }
     }
 
-    public boolean parseField(Field field, Object obj) {
-//        jsonBuilder.append("\"");
-//        jsonBuilder.append(field.getName());
-//        jsonBuilder.append("\"");
-//        jsonBuilder.append(":");
+    public void parsePropertyValue(Field field, Object obj) {
         Object fieldObject = null;
         try {
             fieldObject = field.get(obj);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
-        if (fieldObject != null) {
-            parseItem(fieldObject);
-            return true;
-        } else {
-            return false;
+        if (fieldObject == null) {
+            expectColon = false;
+            return;
         }
+
+        jsonBuilder.append("\"");
+        jsonBuilder.append(field.getName());
+        jsonBuilder.append("\"");
+        jsonBuilder.append(":");
+        parseItem(fieldObject);
+
     }
 
     public void parseItem(Object item) {

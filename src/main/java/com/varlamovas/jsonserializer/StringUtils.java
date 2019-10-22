@@ -17,4 +17,8 @@ public class StringUtils {
         }
         return true;
     }
+
+    public static String wrapByQuotes(String string) {
+        return "\"" + string + "\"";
+    }
 }

@@ -66,7 +66,7 @@ class SerializerTest {
     @Test
     void fooTest() {
         String serializedJson = JsonSerializer.serialize(new ST_withNullField());
-        String expectedJson = "{\"stringFieldNotNull\":\"stringFieldValue\"}";
+        String expectedJson = "{\"stringFieldNotNull\":\"stringFieldValue\",\"stringFieldNotNull2\":\"stringFieldValue\"}";
         assertEquals(expectedJson, serializedJson);
     }
 
@@ -77,7 +77,7 @@ class SerializerTest {
         List<Field> fields = Arrays.asList(tmp.getClass().getDeclaredFields());
         Field field = fields.get(0);
         Object str = field.get(tmp);
-        field.getInt()
+//        field.getInt()
 
     }
 }
@@ -85,8 +85,9 @@ class SerializerTest {
 
 class ST_withNullField{
 
-//    String stringFieldNotNull = "stringFieldValue";
+    String stringFieldNotNull = "stringFieldValue";
     String stringFieldNull = null;
-    int intField = 1;
+    String stringFieldNotNull2 = "stringFieldValue";
+//    int intField = 1;
 
 }
