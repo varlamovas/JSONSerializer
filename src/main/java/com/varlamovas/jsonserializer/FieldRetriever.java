@@ -57,4 +57,13 @@ public class FieldRetriever {
         }
         return instance;
     }
+
+    public static void setFieldObject(Field field, Object instance, Object fieldObject) {
+        try {
+            field.set(instance, fieldObject);
+        } catch (IllegalAccessException e) {
+            //TODO: need to clarify exception and message
+            throw new FieldRetrieveException();
+        }
+    }
 }

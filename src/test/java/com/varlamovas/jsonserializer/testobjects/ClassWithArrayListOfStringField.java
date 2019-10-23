@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ClassWithArrayListOfStringField implements BaseObject {
-    public List<String> listOfStrings;
+    public ArrayList<String> listOfStrings;
 
     private void setListOfStrings() {
         listOfStrings = new ArrayList<>();

@@ -2,25 +2,23 @@ package com.varlamovas.jsonserializer;
 
 import com.varlamovas.jsonserializer.exceptions.MalformedJSONException;
 import com.varlamovas.jsonserializer.readers.CharacterReader;
+import com.varlamovas.jsonserializer.seed.BaseSeed;
+import com.varlamovas.jsonserializer.seed.CollectionSeed;
 import com.varlamovas.jsonserializer.seed.ObjectSeed;
 import com.varlamovas.jsonserializer.tokens.*;
 import com.varlamovas.jsonserializer.tokens.ValueToken;
 import com.varlamovas.jsonserializer.tokens.Token;
 
-import java.lang.reflect.Field;
-import java.util.List;
 import java.util.function.Consumer;
 
 public class Parser<T> {
 
     private Lexer lexer;
-    private List<Field> listOfFields;
     private ObjectSeed<T> objectSeed;
 
     public Parser(CharacterReader reader, ObjectSeed<T> objectSeed) {
         lexer = new Lexer(reader);
         this.objectSeed = objectSeed;
-        this.listOfFields = objectSeed.getAllFields();
     }
 
     private void expect(Token token) {
@@ -43,20 +41,25 @@ public class Parser<T> {
         }
     }
 
-    public void parseArrayBody(ObjectSeed objSeed, String propName) {
+    public void parseArrayBody(CollectionSeed objSeed, String propName) {
         parseCommaSeparated(MarkToken.RIGHT_SQUARE_BRACKET, (token) -> {
             parsePropertyValue(objSeed, propName, token);
         });
     }
 
-    public void parsePropertyValue(ObjectSeed objectSeed, String propertyName, Token token) {
+    public void parsePropertyValue(BaseSeed seed, String propertyName, Token token) {
         if (token instanceof ValueToken) {
-            objectSeed.addProperty(propertyName, token);
+            if (seed instanceof ObjectSeed) {
+                seed.addProperty(propertyName, token);
+            } else if (seed instanceof CollectionSeed) {
+                ((CollectionSeed) seed).add(token);
+            }
         }
-//        if (token.equals(MarkToken.LEFT_SQUARE_BRACKET)) {
-//            ObjectSeed newArrayObj = objectSeed.createNewArrayObject(propertyName);
-//            parseArrayBody(newArrayObj, propertyName);
-//        }
+        if (token.equals(MarkToken.LEFT_SQUARE_BRACKET)) {
+            CollectionSeed collectionSeed = seed.createCollectionSeed(propertyName);
+            parseArrayBody(collectionSeed, propertyName);
+            seed.addCombProperty(propertyName, collectionSeed);
+        }
 //        if (token.equals(MarkToken.LEFT_CURLY_BRACE)) {
 //            ObjectSeed newObj = objectSeed.createNewObject(propertyName);
 //            parseObjectBody(newObj);

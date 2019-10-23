@@ -25,6 +25,18 @@ public class AdapterFactory {
         else return null;
     }
 
+    public static ObjectAdapter getAdapter(Class clazz) {
+        if (clazz.equals(String.class)) {
+            return STRING_ADAPTER;
+        } else if (clazz.equals(Character.class)) {
+            return CHARACTER_ADAPTER;
+        } else if (clazz.equals(Boolean.class)) {
+            return BOOLEAN_ADAPTER;
+        } else if (Number.class.isAssignableFrom(clazz)) {
+            return NUMBER_ADAPTER;
+        } else return null;
+    }
+
     public static PrimitiveAdapter getPrimitiveAdapter() {
         return PRIMITIVE_ADAPTER;
     }

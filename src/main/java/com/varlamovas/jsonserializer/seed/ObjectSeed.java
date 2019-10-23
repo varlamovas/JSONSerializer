@@ -2,9 +2,10 @@ package com.varlamovas.jsonserializer.seed;
 
 import com.varlamovas.jsonserializer.FieldRetriever;
 import com.varlamovas.jsonserializer.adapters.AdapterFactory;
+import com.varlamovas.jsonserializer.adapters.BaseAdapter;
+import com.varlamovas.jsonserializer.adapters.ObjectAdapter;
 import com.varlamovas.jsonserializer.exceptions.MalformedJSONException;
 import com.varlamovas.jsonserializer.tokens.Token;
-import com.varlamovas.jsonserializer.adapters.ObjectAdapter;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
@@ -19,7 +20,8 @@ public class ObjectSeed<T> extends BaseSeed{
     private Type type;
     private List<Field> allFields;
     private T instance;
-    private HashMap<String, Object> propMap = new HashMap<>();
+    private HashMap<String, Token> propMapSimple = new HashMap<>();
+    private HashMap<String, BaseSeed> propMapComb = new HashMap<>();
 
     public ObjectSeed(Class<T> clazz, Type type) {
         this.clazz = clazz;
@@ -56,33 +58,36 @@ public class ObjectSeed<T> extends BaseSeed{
         return findedField.get(0);
     }
 
-    public BaseSeed createNewArrayObject(String propName) {
+    public CollectionSeed createCollectionSeed(String propName) {
         Class<?> clazz = getField(propName).getType();
         Type type = getField(propName).getGenericType();
         return new CollectionSeed(clazz, type);
     }
 
-    public BaseSeed createNewObject(String propName) {
-        Class<?> clazz = getField(propName).getClass();
-        return new ObjectSeed(clazz);
-    }
+//    public BaseSeed createNewObject(String propName) {
+//        Class<?> clazz = getField(propName).getClass();
+//        return new ObjectSeed(clazz);
+//    }
 
     public void addProperty(String propertyName, Token token) {
-        ObjectAdapter adapter = AdapterFactory.getAdapter(null);
-        Object obj = null;
-//        Object obj = adapter.fromJson(token);
-        propMap.put(propertyName, obj);
+        propMapSimple.put(propertyName, token);
+    }
+
+    public void addCombProperty(String propertyName, BaseSeed seed) {
+        propMapComb.put(propertyName, seed);
     }
 
     public T spawn() {
         instance = newInstance();
-        for (Map.Entry<String, Object> entry: propMap.entrySet()) {
+        for (Map.Entry<String, Token> entry: propMapSimple.entrySet()) {
             Field field = getField(entry.getKey());
-            try {
-                field.set(instance, entry.getValue());
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
+            ObjectAdapter adapter = AdapterFactory.getAdapter(field.getType());
+            assert adapter != null;
+            adapter.fromJson(entry.getValue(), field, instance);
+        } for (Map.Entry<String, BaseSeed> entry: propMapComb.entrySet()) {
+            Field field = getField(entry.getKey());
+            BaseSeed seed = entry.getValue();
+            FieldRetriever.setFieldObject(field, instance, seed.spawn());
         }
         return instance;
     }

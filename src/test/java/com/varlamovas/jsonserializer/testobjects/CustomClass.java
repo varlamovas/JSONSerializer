@@ -3,7 +3,6 @@ package com.varlamovas.jsonserializer.testobjects;
 public class CustomClass {
 
     public String stringField;
-    public byte byteField;
     public Byte byteFieldBoxed;
     public Short shortFieldBoxed;
     public Character charFieldBoxed;
@@ -15,7 +14,6 @@ public class CustomClass {
 
     public void setAllFIelds() {
         stringField = "stringFieldValue";
-        byteField = 127;
         byteFieldBoxed = 127;
         shortFieldBoxed = 32767;
         charFieldBoxed = 'c';
