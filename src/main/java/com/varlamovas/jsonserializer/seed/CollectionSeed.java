@@ -9,10 +9,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 public class CollectionSeed<T extends Collection> extends BaseSeed {
     private Type type;
@@ -90,7 +87,13 @@ public class CollectionSeed<T extends Collection> extends BaseSeed {
     }
 
     public T spawn() {
-        Class<?> clazzInnerType = getInnerType();
+        Class<?> clazzInnerType;
+        Type type = getInnerType();
+        if (type instanceof ParameterizedType) {
+            clazzInnerType = (Class<?>) ((ParameterizedType) type).getRawType();
+        } else {
+            clazzInnerType = (Class<?>) type;
+        }
         ObjectAdapter adapter = AdapterFactory.getAdapter(clazzInnerType);
         for (Token token : tokens) {
             adapter.fromJson(token, this);
@@ -114,35 +117,38 @@ public class CollectionSeed<T extends Collection> extends BaseSeed {
 
 
     public CollectionSeed createCollectionSeed() {
-        Class<?> clazz = getInnerType();
-        return new CollectionSeed(clazz, clazz.getComponentType());
+        Class<?> clazz;
+        Type type = getInnerType();
+        if (type instanceof ParameterizedType) {
+            clazz = (Class<?>) ((ParameterizedType) type).getRawType();
+        } else {
+            clazz = (Class<?>) type;
+        }
+        return new CollectionSeed(clazz, type);
     }
 
     public ObjectSeed<?> createNewObject() {
-        Class<?> clazz = getInnerType();
+        Class<?> clazz;
+        Type type = getInnerType();
+        if (type instanceof ParameterizedType) {
+            clazz = (Class<?>) ((ParameterizedType) type).getRawType();
+        } else {
+            clazz = (Class<?>) type;
+        }
+
+        if (Map.class.isAssignableFrom(clazz)) {
+            return new MapSeed<>(clazz);
+        }
         return new ObjectSeed<>(clazz);
     }
 
-    public Class<?> getInnerType() {
+    public Type getInnerType() {
         assert type instanceof ParameterizedType;
         ParameterizedType paramType = (ParameterizedType) type;
         Type[] typeArgs = paramType.getActualTypeArguments();
         assert typeArgs.length == 1;
         Type innerType = typeArgs[0];
-        Type rawInnerType = null;
-        ParameterizedType paramInnerType = null;
-        Class<?> clazzInnerType = null;
-        if (innerType instanceof ParameterizedType) {
-            paramInnerType = (ParameterizedType) innerType;
-            Type ownerType = paramInnerType.getOwnerType();
-            rawInnerType = paramInnerType.getRawType();
-            Class<?> foo = (Class<?>) paramInnerType.getRawType();
-            clazzInnerType = innerType.getClass();
-        }
-
-        else clazzInnerType = (Class<?>) innerType;
-
-        return clazzInnerType;
+        return innerType;
     }
 
     @Override

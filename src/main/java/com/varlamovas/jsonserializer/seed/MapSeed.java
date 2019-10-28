@@ -2,7 +2,18 @@ package com.varlamovas.jsonserializer.seed;
 
 import com.varlamovas.jsonserializer.tokens.Token;
 
-public class MapSeed extends BaseSeed {
+import java.lang.reflect.Type;
+
+public class MapSeed<T> extends ObjectSeed<T> {
+
+    public MapSeed(Class<T> clazz, Type type) {
+        super(clazz, type);
+    }
+
+    public MapSeed(Class<T> clazz) {
+        super(clazz);
+    }
+
     @Override
     public void addProperty(String propertyName, Token token) {
 
@@ -19,7 +30,7 @@ public class MapSeed extends BaseSeed {
     }
 
     @Override
-    public Object spawn() {
+    public T spawn() {
         return null;
     }
 }

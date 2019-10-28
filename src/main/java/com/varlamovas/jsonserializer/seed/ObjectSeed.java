@@ -68,6 +68,9 @@ public class ObjectSeed<T> extends BaseSeed{
 
     public ObjectSeed<?> createNewObject(String propName) {
         Class<?> clazz = getField(propName).getType();
+        if (Map.class.isAssignableFrom(clazz)) {
+            return new MapSeed<>(clazz);
+        }
         return new ObjectSeed(clazz);
     }
 

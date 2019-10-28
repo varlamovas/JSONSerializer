@@ -30,6 +30,16 @@ public class Performance {
         jsonSerializer.serialize(testClass);
     }
 
+    @Test
+    void testPerformanceGsonDeserialize() {
+        gsonSerializer.fromJson(gsonSerializer.toJson(testClass), ClassWithLargeList.class);
+    }
+
+    @Test
+    void testPerformanceJsonserializerDeserialize() {
+        jsonSerializer.deserialize(jsonSerializer.serialize(testClass), ClassWithLargeList.class);
+    }
+
 //    @Test
 //    void testResult() {
 //        String gsonString = gsonSerializer.toJson(testClass);
@@ -58,6 +68,7 @@ class ClassWithLargeList {
         int defaultCapacity = 1_000_000;
         return getInstanceofClassWithLargeList(defaultCapacity);
     }
+
 }
 
 class CollectionEntry {
