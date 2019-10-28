@@ -4,16 +4,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ClassWithListOfSimpleObjects implements BaseObject {
-    List<SimpleObject> listOfSimpleObjects = new ArrayList<>();
+    public ArrayList<SimpleObject> listOfSimpleObjects;
 
-    public ClassWithListOfSimpleObjects() {
+    void setListOfSimpleObjects() {
+        listOfSimpleObjects = new ArrayList<>();
         for (int i = 0; i < 10; ++i) {
-            listOfSimpleObjects.add(new SimpleObject("name" + i));
+            listOfSimpleObjects.add(SimpleObject.getInstance("name" + i));
         }
     }
 
     public static ClassWithListOfSimpleObjects getInstance() {
-        return new ClassWithListOfSimpleObjects();
+        ClassWithListOfSimpleObjects obj = new ClassWithListOfSimpleObjects();
+        obj.setListOfSimpleObjects();
+        return obj;
     }
 
     public static String toJson() {

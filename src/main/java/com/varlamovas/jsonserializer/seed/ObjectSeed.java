@@ -7,6 +7,7 @@ import com.varlamovas.jsonserializer.adapters.ObjectAdapter;
 import com.varlamovas.jsonserializer.exceptions.MalformedJSONException;
 import com.varlamovas.jsonserializer.tokens.Token;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.util.HashMap;
@@ -39,6 +40,7 @@ public class ObjectSeed<T> extends BaseSeed{
 
     public T newInstance() {
         instance = null;
+
         try {
             instance = clazz.newInstance();
         } catch (InstantiationException e) {
@@ -64,10 +66,10 @@ public class ObjectSeed<T> extends BaseSeed{
         return new CollectionSeed(clazz, type);
     }
 
-//    public BaseSeed createNewObject(String propName) {
-//        Class<?> clazz = getField(propName).getClass();
-//        return new ObjectSeed(clazz);
-//    }
+    public ObjectSeed<?> createNewObject(String propName) {
+        Class<?> clazz = getField(propName).getType();
+        return new ObjectSeed(clazz);
+    }
 
     public void addProperty(String propertyName, Token token) {
         propMapSimple.put(propertyName, token);

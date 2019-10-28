@@ -56,14 +56,32 @@ public class Parser<T> {
             }
         }
         if (token.equals(MarkToken.LEFT_SQUARE_BRACKET)) {
-            CollectionSeed collectionSeed = seed.createCollectionSeed(propertyName);
-            parseArrayBody(collectionSeed, propertyName);
-            seed.addCombProperty(propertyName, collectionSeed);
+            if (seed instanceof ObjectSeed) {
+                ObjectSeed<?> objSeed = (ObjectSeed<?>) seed;
+                CollectionSeed<?> newCollection = objSeed.createCollectionSeed(propertyName);
+                parseArrayBody(newCollection, propertyName);
+                seed.addCombProperty(propertyName, newCollection);
+            }
+            else if (seed instanceof CollectionSeed) {
+                CollectionSeed<?> collectionSeed = (CollectionSeed<?>) seed;
+                CollectionSeed<?> newCollection = collectionSeed.createCollectionSeed();
+                parseArrayBody(newCollection, propertyName);
+                collectionSeed.addComb(newCollection);
+            }
         }
-//        if (token.equals(MarkToken.LEFT_CURLY_BRACE)) {
-//            ObjectSeed newObj = objectSeed.createNewObject(propertyName);
-//            parseObjectBody(newObj);
-//        }
+        if (token.equals(MarkToken.LEFT_CURLY_BRACE)) {
+            if (seed instanceof ObjectSeed) {
+                ObjectSeed<?> objSeed = (ObjectSeed<?>) seed;
+                ObjectSeed<?> newObj = objSeed.createNewObject(propertyName);
+                parseObjectBody(newObj);
+                seed.addCombProperty(propertyName, newObj);
+            } else if (seed instanceof CollectionSeed) {
+                CollectionSeed<?> collectionSeed = (CollectionSeed<?>) seed;
+                ObjectSeed<?> newObj = collectionSeed.createNewObject();
+                parseObjectBody(newObj);
+                collectionSeed.addComb(newObj);
+            }
+        }
     }
 
     public void parseObjectBody(ObjectSeed objectSeed) {

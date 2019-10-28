@@ -33,7 +33,7 @@ class SerializerTest {
                 Arguments.of(ChildrenClassWithSetter.getInstanceOfChildrenClassWithSetters(), "{\"childrenSettedString\":\"childrenSettedStringValue\",\"parentSettedString\":\"parentSettedStringValue\"}"),
                 Arguments.of(ClassWithSetter.getInstanceOfClassWithSetters(), "{\"settedString\":\"settedStringValue\"}"),
                 Arguments.of(ClassWithArrayListOfStringField.getInstance(), "{\"listOfStrings\":[\"list\",\"Of\",\"Strings\"]}"),
-                Arguments.of(new ClassWithListOfListOfStringsField(), "{\"listOfListOfStrings\":[[\"first\",\"list\",\"Of\",\"Strings\"],[\"second\",\"list\",\"Of\",\"Strings\"]]}"),
+                Arguments.of(ClassWithListOfListOfStringsField.getInstance(), ClassWithListOfListOfStringsField.toJson()),
                 Arguments.of(new ClassWithSetOfStringsField(), "{\"setOfStrings\":[\"set\",\"Of\",\"Strings\"]}"),
                 Arguments.of(new ClassWithQueueOfStringsField(), "{\"queueOfStrings\":[\"queue\",\"Of\",\"Strings\"]}"),
                 Arguments.of(new ClassWithMapOfStringToString(), "{\"mapOfStringToString\":{\"firstKey\":\"firstValue\",\"secondKey\":\"secondValue\"}}"),

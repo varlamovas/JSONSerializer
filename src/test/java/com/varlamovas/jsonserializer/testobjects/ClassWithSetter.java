@@ -3,7 +3,7 @@ package com.varlamovas.jsonserializer.testobjects;
 public class ClassWithSetter implements BaseObject {
     String settedString;
 
-    public void setSettedString(String str) {
+    private void setSettedString(String str) {
         settedString = str;
     }
 

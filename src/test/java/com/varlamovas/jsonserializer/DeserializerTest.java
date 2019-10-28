@@ -52,6 +52,20 @@ public class DeserializerTest {
     }
 
     @Test
+    void deserializeClassWithListOfSimpleObjects() {
+        ClassWithListOfSimpleObjects initial = ClassWithListOfSimpleObjects.getInstance();
+        ClassWithListOfSimpleObjects deserialized = jsonSerializer.deserialize(ClassWithListOfSimpleObjects.toJson(), ClassWithListOfSimpleObjects.class);
+        assertIterableEquals(initial.listOfSimpleObjects, deserialized.listOfSimpleObjects);
+    }
+
+    @Test
+    void deserialize__ClassWithListOfListOfStringsField() {
+        ClassWithListOfListOfStringsField initial = ClassWithListOfListOfStringsField.getInstance();
+        ClassWithListOfListOfStringsField deserialized = jsonSerializer.deserialize(ClassWithListOfListOfStringsField.toJson(), ClassWithListOfListOfStringsField.class);
+        assertIterableEquals(initial.listOfListOfStrings, deserialized.listOfListOfStrings);
+    }
+
+    @Test
     void deserializeSimple() {
         String json = "{\"stringField\":\"stringValue\"}";
         ClassSimple classSimple = new ClassSimple();

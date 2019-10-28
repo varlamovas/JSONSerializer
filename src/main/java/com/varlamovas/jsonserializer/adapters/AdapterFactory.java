@@ -1,7 +1,5 @@
 package com.varlamovas.jsonserializer.adapters;
 
-import com.varlamovas.jsonserializer.FieldRetriever;
-
 public class AdapterFactory {
 
     private static final ObjectAdapter STRING_ADAPTER = new StringAdapter();
