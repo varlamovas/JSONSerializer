@@ -1,6 +1,5 @@
 package com.varlamovas.jsonserializer.seed;
 
-import com.varlamovas.jsonserializer.FieldRetriever;
 import com.varlamovas.jsonserializer.adapters.AdapterFactory;
 import com.varlamovas.jsonserializer.adapters.ObjectAdapter;
 import com.varlamovas.jsonserializer.tokens.Token;
@@ -11,13 +10,11 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.*;
 
-public class CollectionSeed<T extends Collection> extends BaseSeed {
+public class CollectionSeed<T extends Collection> implements ArraySeed<T> {
     private Type type;
     private List<Field> allFields;
-    private HashMap<String, Object> propMap = new HashMap<>();
     private Class<T> clazz;
     private T instance;
-    private HashMap<String, BaseSeed> propMapComb = new HashMap<>();
     private List<BaseSeed> seeds = new ArrayList<>();
 
     private List<Token> tokens = new ArrayList<>();
@@ -29,27 +26,27 @@ public class CollectionSeed<T extends Collection> extends BaseSeed {
         newInstance();
     }
 
-    private Collection<?> createInstance(Class<?> clazz) {
-        Collection<?> instance = null;
+//    private Collection<> createInstance(Class<?> clazz) {
+//        Collection<?> instance = null;
+//
+//        if (clazz.isInterface()) {
+//            if (List.class.isAssignableFrom(clazz)) {
+//                instance = new ArrayList<>();
+//                return instance;
+//            }
+//        }
+//
+//        try {
+//            instance = (Collection<?>) clazz.newInstance();
+//        } catch (InstantiationException e) {
+//            e.printStackTrace();
+//        } catch (IllegalAccessException e) {
+//            e.printStackTrace();
+//        }
+//        return instance;
+//    }
 
-        if (clazz.isInterface()) {
-            if (List.class.isAssignableFrom(clazz)) {
-                instance =  new ArrayList<>();
-                return instance;
-            }
-        }
-
-        try {
-            instance = (Collection<?>) clazz.newInstance();
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
-        return instance;
-    }
-
-    public Collection<?> newInstance() {
+    public T newInstance() {
         instance = null;
         Constructor<?>[] constructors = clazz.getConstructors();
 
@@ -82,7 +79,7 @@ public class CollectionSeed<T extends Collection> extends BaseSeed {
         seeds.add(seed);
     }
 
-    public Collection getInstance() {
+    public Collection<?> getInstance() {
         return instance;
     }
 
@@ -98,6 +95,9 @@ public class CollectionSeed<T extends Collection> extends BaseSeed {
         for (Token token : tokens) {
             adapter.fromJson(token, this);
         }
+
+
+
         for (BaseSeed seed : seeds) {
             instance.add(seed.spawn());
         }
@@ -105,29 +105,29 @@ public class CollectionSeed<T extends Collection> extends BaseSeed {
     }
 
     @Override
-    public void addProperty(String propertyName, Token token) {
-
+    public boolean isPropertyValue() {
+        return false;
     }
-
 
     @Override
-    public CollectionSeed createCollectionSeed(String name) {
-        return null;
+    public boolean isCollection() {
+        return true;
     }
 
-
-    public CollectionSeed createCollectionSeed() {
-        Class<?> clazz;
+    @Override
+    public ArraySeed<?> createCollectionSeed() {
+        Class<Collection> clazz;
         Type type = getInnerType();
         if (type instanceof ParameterizedType) {
-            clazz = (Class<?>) ((ParameterizedType) type).getRawType();
+            clazz = (Class<Collection>) ((ParameterizedType) type).getRawType();
         } else {
-            clazz = (Class<?>) type;
+            clazz = (Class<Collection>) type;
         }
-        return new CollectionSeed(clazz, type);
+        return new CollectionSeed<>(clazz, type);
     }
 
-    public ObjectSeed<?> createNewObject() {
+    @Override
+    public PropertyValueSeed<?> createNewObject() {
         Class<?> clazz;
         Type type = getInnerType();
         if (type instanceof ParameterizedType) {
@@ -137,12 +137,13 @@ public class CollectionSeed<T extends Collection> extends BaseSeed {
         }
 
         if (Map.class.isAssignableFrom(clazz)) {
-            return new MapSeed<>(clazz);
+            Class<? extends Map> klass = (Class<? extends Map>) ((ParameterizedType) type).getRawType();
+            return new MapSeed(klass, type);
         }
         return new ObjectSeed<>(clazz);
     }
 
-    public Type getInnerType() {
+    private Type getInnerType() {
         assert type instanceof ParameterizedType;
         ParameterizedType paramType = (ParameterizedType) type;
         Type[] typeArgs = paramType.getActualTypeArguments();
@@ -151,8 +152,4 @@ public class CollectionSeed<T extends Collection> extends BaseSeed {
         return innerType;
     }
 
-    @Override
-    public void addCombProperty(String propertyName, BaseSeed seed) {
-
-    }
 }

@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class ObjectSeed<T> extends BaseSeed{
+public class ObjectSeed<T> implements PropertyValueSeed<T>{
 
     private Class<T> clazz;
     private Type type;
@@ -60,16 +60,17 @@ public class ObjectSeed<T> extends BaseSeed{
         return findedField.get(0);
     }
 
-    public CollectionSeed createCollectionSeed(String propName) {
+    public ArraySeed<?> createCollectionSeed(String propName) {
         Class<?> clazz = getField(propName).getType();
         Type type = getField(propName).getGenericType();
         return new CollectionSeed(clazz, type);
     }
 
-    public ObjectSeed<?> createNewObject(String propName) {
+    public PropertyValueSeed createNewObject(String propName) {
         Class<?> clazz = getField(propName).getType();
+        Type type = getField(propName).getGenericType();
         if (Map.class.isAssignableFrom(clazz)) {
-            return new MapSeed<>(clazz);
+            return new MapSeed(clazz, type);
         }
         return new ObjectSeed(clazz);
     }
@@ -95,5 +96,15 @@ public class ObjectSeed<T> extends BaseSeed{
             FieldRetriever.setFieldObject(field, instance, seed.spawn());
         }
         return instance;
+    }
+
+    @Override
+    public boolean isPropertyValue() {
+        return true;
+    }
+
+    @Override
+    public boolean isCollection() {
+        return false;
     }
 }

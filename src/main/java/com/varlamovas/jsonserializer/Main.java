@@ -9,9 +9,22 @@ import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
-        String s0 = String.valueOf((char) 0);
-        String s1 = String.valueOf((char) 1);
-        String s2 = String.valueOf((char) 2);
-        System.out.println(String.valueOf((char) 0));
+        List<String> list = new ArrayList<>();
+        list.add("some");
+        list.add("string");
+        Primer<String> primer = new Primer<>(list);
+        System.out.println(primer);
+    }
+}
+
+class Primer<T> {
+
+    T foo;
+
+    List<T> list = new ArrayList<>();
+
+    Primer(List<T> list) {
+        System.out.println();
+        this.list = list;
     }
 }

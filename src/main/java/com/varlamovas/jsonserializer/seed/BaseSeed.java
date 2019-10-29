@@ -2,13 +2,17 @@ package com.varlamovas.jsonserializer.seed;
 
 import com.varlamovas.jsonserializer.tokens.Token;
 
-public abstract class BaseSeed {
+public interface BaseSeed<T> {
 
-    public abstract void addProperty(String propertyName, Token token);
-    public abstract CollectionSeed createCollectionSeed(String name);
-    public abstract void addCombProperty(String propertyName, BaseSeed seed);
+    public T spawn();
+    public boolean isPropertyValue();
+    public boolean isCollection();
 
-    public abstract Object spawn();
+//    public abstract void addProperty(String propertyName, Token token);
+//    public abstract CollectionSeed createCollectionSeed(String name);
+//    public abstract void addCombProperty(String propertyName, BaseSeed seed);
+//
+//    public abstract Object spawn();
 
 //    public ObjectSeed createCollectionSeed(String propName) {
 //        Class<?> clazz = getField(propName).getClass();
