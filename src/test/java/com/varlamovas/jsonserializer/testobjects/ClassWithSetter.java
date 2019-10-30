@@ -7,9 +7,13 @@ public class ClassWithSetter implements BaseObject {
         settedString = str;
     }
 
-    public static ClassWithSetter getInstanceOfClassWithSetters() {
+    public static ClassWithSetter getInstance() {
         ClassWithSetter classWithSetter = new ClassWithSetter();
         classWithSetter.setSettedString("settedStringValue");
         return classWithSetter;
+    }
+
+    public static String getJson() {
+        return "{\"settedString\":\"settedStringValue\"}";
     }
 }

@@ -19,7 +19,7 @@ public class ClassWithListOfListOfStringsField implements BaseObject {
         return instance;
     }
 
-    public static String toJson() {
+    public static String getJson() {
         return "{\"listOfListOfStrings\":[[\"first\",\"list\",\"Of\",\"Strings\"],[\"second\",\"list\",\"Of\",\"Strings\"]]}";
     }
 }

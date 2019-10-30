@@ -37,8 +37,9 @@ public class StringAdapter implements ObjectAdapter {
     }
 
     @Override
-    public void fromJson(Token token, MapSeed seed) {
+    public void fromJson(String property, Token token, MapSeed seed) {
         Map<String, String> map = seed.getInstance();
+        map.put(property, token.getValue());
     }
 
     @Override

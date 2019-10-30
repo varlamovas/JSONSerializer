@@ -32,7 +32,12 @@ public class FooObject implements BaseObject {
         put("secondKey", "secondValue");
     }};
 
-    public static String toJson() {
+    public static String getJson() {
         return "{\"stringField\":\"stringFieldValue\",\"byteField\":127,\"shortField\":32767,\"charField\":\"c\",\"intField\":2147483647,\"longField\":9223372036854775807,\"floatField\":3.4E38,\"doubleField\":1.7E308,\"booleanField\":true,\"byteFieldBoxed\":127,\"shortFieldBoxed\":32767,\"charFieldBoxed\":\"c\",\"intFieldBoxed\":2147483647,\"longFieldBoxed\":9223372036854775807,\"floatFieldBoxed\":3.4E38,\"doubleFieldBoxed\":1.7E308,\"booleanFieldBoxed\":true,\"arrayInt\":[1,2,3,4],\"arrayString\":[\"one\",\"two\",\"three\"],\"listOfNumbers\":[1,2,3,4],\"mapOfStringToString\":{\"firstKey\":\"firstValue\",\"secondKey\":\"secondValue\"}}";
+    }
+
+    public static FooObject getInstance() {
+        FooObject instance = new FooObject();
+        return instance;
     }
 }

@@ -16,4 +16,7 @@ public class ClassWithListOfStringField implements BaseObject {
         return inst;
     }
 
+    public static String getJson() {
+        return "{\"listOfStrings\":[\"list\",\"Of\",\"Strings\"]}";
+    }
 }

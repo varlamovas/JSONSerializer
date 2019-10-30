@@ -11,7 +11,7 @@ import java.lang.reflect.Field;
 public interface ObjectAdapter extends BaseAdapter {
     default void fromJson(Token token, Field field, Object instance) {};
     default void fromJson(Token token, CollectionSeed seed) {}
-    default void fromJson(Token token, MapSeed seed) {}
+    default void fromJson(String property, Token token, MapSeed seed) {}
     String toJson(Object value);
 
 }

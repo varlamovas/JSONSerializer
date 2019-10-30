@@ -7,10 +7,14 @@ public class ChildrenClassWithSetter extends ParentClassWithSetter implements Ba
         childrenSettedString = str;
     }
 
-    public static ChildrenClassWithSetter getInstanceOfChildrenClassWithSetters() {
+    public static ChildrenClassWithSetter getInstance() {
         ChildrenClassWithSetter childrenClassWithSetter = new ChildrenClassWithSetter();
         childrenClassWithSetter.setChildrenSettedString("childrenSettedStringValue");
         childrenClassWithSetter.setParentSettedString("parentSettedStringValue");
         return childrenClassWithSetter;
+    }
+
+    public static String getJson() {
+        return "{\"childrenSettedString\":\"childrenSettedStringValue\",\"parentSettedString\":\"parentSettedStringValue\"}";
     }
 }

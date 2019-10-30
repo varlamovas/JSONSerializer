@@ -15,29 +15,6 @@ public class FooTest {
     @Test
     void fooTest() {
 
-        Foo f = Foo.class.cast(new Object());
-
-        List<Class> superClasses = FieldRetriever.getAllSuperClasses(Foo.class);
-        try {
-            Constructor<?> constructor = Foo.class.getConstructor(String.class);
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        }
-        Constructor<?>[] constructors = Foo.class.getConstructors();
-        Constructor<?>[] declaredConstructors = Foo.class.getDeclaredConstructors();
-        Constructor<?> constructor1 = declaredConstructors[0];
-        constructor1.setAccessible(true);
-        Foo instance = null;
-        try {
-            instance = (Foo) constructor1.newInstance(null);
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        }
-
     }
 
     @Test

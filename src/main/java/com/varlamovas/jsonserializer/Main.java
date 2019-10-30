@@ -12,8 +12,9 @@ public class Main {
         List<String> list = new ArrayList<>();
         list.add("some");
         list.add("string");
-        Primer<String> primer = new Primer<>(list);
+        Primer primer = new Primer(list);
         System.out.println(primer);
+        Object str = primer.getElement();
     }
 }
 
@@ -26,5 +27,9 @@ class Primer<T> {
     Primer(List<T> list) {
         System.out.println();
         this.list = list;
+    }
+
+    T getElement() {
+        return list.get(0);
     }
 }

@@ -9,7 +9,9 @@ import com.varlamovas.jsonserializer.tokens.Token;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,9 +42,14 @@ public class ObjectSeed<T> implements PropertyValueSeed<T>{
 
     public T newInstance() {
         instance = null;
-
+        List<Constructor> constructors = Arrays.asList(clazz.getDeclaredConstructors());
+        constructors.forEach(constructor -> constructor.setAccessible(true));
         try {
-            instance = clazz.newInstance();
+            try {
+                instance = (T) constructors.get(0).newInstance();
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
+            }
         } catch (InstantiationException e) {
             e.printStackTrace();
         } catch (IllegalAccessException e) {

@@ -16,4 +16,13 @@ public class ClassWithMapOfStringToMapOfStringToNumber implements BaseObject {
             }});
         }
     };
+
+    public static ClassWithMapOfStringToMapOfStringToNumber getInstance() {
+        ClassWithMapOfStringToMapOfStringToNumber instance = new ClassWithMapOfStringToMapOfStringToNumber();
+        return instance;
+    }
+
+    public static String getJson() {
+        return "{\"mapOfStringToMapOfStringToNumber\":{\"firstKey\":{\"firstFirstKey\":1,\"firstSecondKey\":2},\"secondKey\":{\"secondSecondKey\":2,\"secondFirstKey\":1}}}";
+    }
 }

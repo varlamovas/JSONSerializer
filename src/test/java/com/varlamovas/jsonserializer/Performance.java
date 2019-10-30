@@ -54,7 +54,7 @@ class ClassWithLargeList {
 
     private void setLargeList(int capacity) {
         for (int i = 0; i < capacity; ++i) {
-            listOfCollectionEntry.add(new CollectionEntry("name" + i, "value" + i));
+            listOfCollectionEntry.add(CollectionEntry.getInstance("name" + i, "value" + i));
         }
     }
 
@@ -72,15 +72,17 @@ class ClassWithLargeList {
 }
 
 class CollectionEntry {
-    final String name;
-    final String value;
+    private String name;
+    private String value;
 
-    private CollectionEntry() {
-        this(null, null);
-    }
-
-    CollectionEntry(String name, String value) {
+    void setFields(String name, String value) {
         this.name = name;
         this.value = value;
+    }
+
+    public static CollectionEntry getInstance(String name, String value) {
+        CollectionEntry instance = new CollectionEntry();
+        instance.setFields(name, value);
+        return instance;
     }
 }

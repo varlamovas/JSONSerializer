@@ -19,7 +19,7 @@ public class ClassWithListOfSimpleObjects implements BaseObject {
         return obj;
     }
 
-    public static String toJson() {
+    public static String getJson() {
         return "{\"listOfSimpleObjects\":[{\"field\":\"name0\"},{\"field\":\"name1\"},{\"field\":\"name2\"},{\"field\":\"name3\"},{\"field\":\"name4\"},{\"field\":\"name5\"},{\"field\":\"name6\"},{\"field\":\"name7\"},{\"field\":\"name8\"},{\"field\":\"name9\"}]}";
     }
 }

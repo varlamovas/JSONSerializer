@@ -59,18 +59,18 @@ public class MapSeed<T extends Map> implements PropertyValueSeed<T> {
         }
         ObjectAdapter adapter = AdapterFactory.getAdapter(clazzInnerValueType);
         for (Map.Entry<String, Token> entry : propToToken.entrySet()) {
-//            adapter.fromJson();
+            adapter.fromJson(entry.getKey() ,entry.getValue(), this);
         }
 
         for (Map.Entry<String, BaseSeed> entry : propToSeed.entrySet()) {
 
         }
-        return null;
+        return instance;
     }
 
     @Override
     public boolean isPropertyValue() {
-        return false;
+        return true;
     }
 
     @Override

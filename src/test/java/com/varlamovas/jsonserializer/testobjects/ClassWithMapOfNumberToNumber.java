@@ -10,4 +10,12 @@ public class ClassWithMapOfNumberToNumber implements BaseObject {
             put(2, 2);
         }
     };
+    public static ClassWithMapOfNumberToNumber getInstance() {
+        ClassWithMapOfNumberToNumber instance = new ClassWithMapOfNumberToNumber();
+        return instance;
+    }
+
+    public static String getJson() {
+        return "{\"mapOfStringToString\":{\"1\":1,\"2\":2}}";
+    }
 }
