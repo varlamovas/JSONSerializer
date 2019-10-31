@@ -4,9 +4,9 @@ import com.varlamovas.jsonserializer.tokens.Token;
 
 public interface BaseSeed<T> {
 
-    public T spawn();
-    public boolean isPropertyValue();
-    public boolean isCollection();
+    T spawn();
+    default boolean isPropertyValue() {return false;}
+    default boolean isCollection() {return false;}
 
 //    public abstract void addProperty(String propertyName, Token token);
 //    public abstract CollectionSeed createCollectionSeed(String name);

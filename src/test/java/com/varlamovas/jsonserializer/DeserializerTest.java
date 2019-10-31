@@ -146,6 +146,24 @@ public class DeserializerTest {
     }
 
     @Test
+    void deserializeWith_ClassWithMapOfStringToClassSimple() {
+        ClassWithMapOfStringToClassSimple instance = ClassWithMapOfStringToClassSimple.getInstance();
+        String json = jsonSerializer.serialize(instance);
+        ClassWithMapOfStringToClassSimple deserialized = jsonSerializer.deserialize(json, ClassWithMapOfStringToClassSimple.class);
+        assertIterableEquals(instance.mapStringToClassSimple.keySet(), deserialized.mapStringToClassSimple.keySet());
+        assertIterableEquals(instance.mapStringToClassSimple.values(), deserialized.mapStringToClassSimple.values());
+    }
+
+//    @Test
+//    void deserializeWith_ClassWithMapOfClassSimpleToClassSimple() {
+//        ClassWithMapOfClassSimpleToClassSimple instance = ClassWithMapOfClassSimpleToClassSimple.getInstance();
+//        String json = gsonSerializer.toJson(instance);
+//        System.out.println(json);
+//        ClassWithMapOfClassSimpleToClassSimple des = gsonSerializer.fromJson(json, ClassWithMapOfClassSimpleToClassSimple.class);
+//        System.out.println(des);
+//    }
+
+    @Test
     void GSON_deserializeWith_ClassWithArrayListOfStringField() {
         ClassWithListOfStringField instance = ClassWithListOfStringField.getInstance();
         String json = gsonSerializer.toJson(instance);

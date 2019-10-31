@@ -5,11 +5,12 @@ import com.varlamovas.jsonserializer.tokens.Token;
 
 import java.lang.reflect.Field;
 
-public class BooleanTypeAdapter implements ObjectAdapter {
+public class BooleanTypeAdapter implements ObjectAdapter<Boolean> {
     @Override
-    public void fromJson(Token token, Field field, Object instance) {
+    public Boolean fromJson(Token token, Field field, Object instance) {
         Boolean bool = new Boolean(token.getValue());
-        FieldRetriever.setFieldObject(field, instance, bool);
+//        FieldRetriever.setFieldObject(field, instance, bool);
+        return bool;
     }
 
     @Override

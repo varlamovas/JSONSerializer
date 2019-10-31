@@ -96,7 +96,8 @@ public class ObjectSeed<T> implements PropertyValueSeed<T>{
             Field field = getField(entry.getKey());
             ObjectAdapter adapter = AdapterFactory.getAdapter(field.getType());
             assert adapter != null;
-            adapter.fromJson(entry.getValue(), field, instance);
+            Object obj = adapter.fromJson(entry.getValue(), field, instance);
+            FieldRetriever.setFieldObject(field, instance, obj);
         } for (Map.Entry<String, BaseSeed> entry: propMapComb.entrySet()) {
             Field field = getField(entry.getKey());
             BaseSeed seed = entry.getValue();

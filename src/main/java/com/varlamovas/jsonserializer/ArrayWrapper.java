@@ -2,21 +2,21 @@ package com.varlamovas.jsonserializer;
 
 import java.lang.reflect.Array;
 
-public class ArrayUtils {
+class ArrayWrapper {
 
-    Object array;
-    Class componentType;
-    Class arrayClass;
-    int arrayLength;
+    private final Object array;
+    private final Class componentType;
+    private final Class arrayClass;
+    private final int arrayLength;
 
-    public ArrayUtils(Object array) {
+    ArrayWrapper(final Object array) {
         this.array = array;
         this.arrayClass = array.getClass();
         this.componentType = arrayClass.getComponentType();
         this.arrayLength = Array.getLength(array);
     }
 
-    public String getAsString(int index) {
+    String getAsString(final int index) {
         if (componentType.equals(byte.class)) {
             byte b = Array.getByte(array, index);
             return String.valueOf(b);

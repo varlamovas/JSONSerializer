@@ -6,4 +6,9 @@ public class ClassSimple {
     public void setStringField(String stringField) {
         this.stringField = stringField;
     }
+
+    @Override
+    public String toString() {
+        return "ClassSimple_" + "stringField_" + stringField;
+    }
 }

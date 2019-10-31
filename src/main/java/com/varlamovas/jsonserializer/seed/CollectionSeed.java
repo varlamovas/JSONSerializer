@@ -93,7 +93,8 @@ public class CollectionSeed<T extends Collection> implements ArraySeed<T> {
         }
         ObjectAdapter adapter = AdapterFactory.getAdapter(clazzInnerType);
         for (Token token : tokens) {
-            adapter.fromJson(token, this);
+            Object obj = adapter.fromJson(token, this);
+            instance.add(obj);
         }
 
 

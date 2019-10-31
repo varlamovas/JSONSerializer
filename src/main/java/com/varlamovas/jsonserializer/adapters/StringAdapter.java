@@ -25,21 +25,24 @@ public class StringAdapter implements ObjectAdapter {
 
 
     @Override
-    public void fromJson(Token token, Field field, Object instance) {
-        FieldRetriever.setFieldObject(field, instance, token.getValue());
+    public String fromJson(Token token, Field field, Object instance) {
+//        FieldRetriever.setFieldObject(field, instance, token.getValue());
+        return token.getValue();
     }
 
     @Override
-    public void fromJson(Token token, CollectionSeed seed) {
+    public String fromJson(Token token, CollectionSeed seed) {
         Collection<String> collection = seed.getInstance();
         String value = token.getValue();
-        collection.add(value);
+//        collection.add(value);
+        return value;
     }
 
     @Override
-    public void fromJson(String property, Token token, MapSeed seed) {
+    public String fromJson(String property, Token token, MapSeed seed) {
         Map<String, String> map = seed.getInstance();
-        map.put(property, token.getValue());
+//        map.put(property, token.getValue());
+        return token.getValue();
     }
 
     @Override

@@ -37,7 +37,9 @@ class SerializerTest {
                 Arguments.of(ClassWithMapOfStringToMapOfStringToNumber.getInstance(), ClassWithMapOfStringToMapOfStringToNumber.getJson()),
                 Arguments.of(FooObject.getInstance(), FooObject.getJson()),
                 Arguments.of(ClassWithListOfSimpleObjects.getInstance(), ClassWithListOfSimpleObjects.getJson()),
-                Arguments.of(ClassWithArrayOfIntegersField.getInstance(), ClassWithArrayOfIntegersField.getJson())
+                Arguments.of(ClassWithArrayOfIntegersField.getInstance(), ClassWithArrayOfIntegersField.getJson()),
+//                Arguments.of(ClassWithMapOfClassSimpleToClassSimple.getInstance(), ClassWithMapOfClassSimpleToClassSimple.getJson()),
+                Arguments.of(ClassWithMapOfStringToClassSimple.getInstance(), ClassWithMapOfStringToClassSimple.getJson())
         );
     }
 

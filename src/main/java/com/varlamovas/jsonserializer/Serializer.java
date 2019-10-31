@@ -9,46 +9,58 @@ import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
-public class Serializer {
+class Serializer {
 
-    private Object obj;
-    private StringBuilder jsonBuilder;
+    private final static String LEFT_CURLY_BRACE = "{";
+    private final static String RIGHT_CURLY_BRACE = "}";
+    private final static String LEFT_SQUARE_BRACKET = "[";
+    private final static String RIGHT_SQUARE_BRACKET = "]";
+    private final static String COLON = ":";
+    private final static String COMMA = ",";
+    private final static String QUOTE = "\"";
+
+    private final Object obj;
+    private final StringBuilder jsonBuilder;
+
     private boolean expectColon = false;
 
-    public Serializer(Object obj) {
+    Serializer(final Object obj) {
         this.obj = obj;
         this.jsonBuilder = new StringBuilder();
     }
 
-    public String serialize() {
 
+    /**
+     * @return JSON representation of the obj passed in the constructor
+     */
+    String serialize() {
         parseObject(obj);
         return jsonBuilder.toString();
     }
 
 
-    public void parseObject(Object obj) {
+    private void parseObject(final Object obj) {
         withCirclyBrackets(() -> {
             List<Field> allFields = FieldRetriever.getAllFields(obj);
             processDeclaredFields(allFields, obj);
         });
     }
 
-    public void processDeclaredFields(List<Field> declaredFields, Object obj) {
+    private void processDeclaredFields(final List<Field> declaredFields,final Object obj) {
         expectColon = false;
         for (Field field : declaredFields) {
-            tryColon();
+            tryComma();
             parsePropertyValue(field, obj);
         }
     }
 
-    public void parsePropertyValue(Field field, Object instanceWithField) {
+    private void parsePropertyValue(final Field field, final Object instanceWithField) {
 
         if (field.getDeclaringClass().isPrimitive()) {
-            jsonBuilder.append("\"");
-            jsonBuilder.append(field.getName());
-            jsonBuilder.append("\"");
+            withQuotes(field::getName);
+
             jsonBuilder.append(":");
             parsePrimitiveItem(field, instanceWithField);
             return;
@@ -60,21 +72,19 @@ public class Serializer {
             return;
         }
 
-        jsonBuilder.append("\"");
-        jsonBuilder.append(field.getName());
-        jsonBuilder.append("\"");
-        jsonBuilder.append(":");
+        withQuotes(field::getName);
+        jsonBuilder.append(Serializer.COLON);
         parseItem(fieldObject);
 
     }
 
-    public void parsePrimitiveItem(Field field, Object instanceWithField) {
+    private void parsePrimitiveItem(final Field field, final Object instanceWithField) {
         PrimitiveAdapter adapter = AdapterFactory.getPrimitiveAdapter();
         jsonBuilder.append(adapter.toJson(field, instanceWithField));
 
     }
 
-    public void parseItem(Object item) {
+    private void parseItem(final Object item) {
 
         Class clazz = item.getClass();
         ObjectAdapter adapter = AdapterFactory.getAdapter(item);
@@ -98,18 +108,18 @@ public class Serializer {
 
     }
 
-    private void parseArrayType(Object arrayTypeObject) {
+    private void parseArrayType(final Object arrayTypeObject) {
         withSquareBrackets(() -> {
             Class componentType = arrayTypeObject.getClass().getComponentType();
             int arrayLength = Array.getLength(arrayTypeObject);
-            ArrayUtils arrayUtils = new ArrayUtils(arrayTypeObject);
+            ArrayWrapper arrayWrapper = new ArrayWrapper(arrayTypeObject);
             boolean isPrimitive = componentType.isPrimitive();
 
             for (int i = 0; i < arrayLength; i++) {
-                tryColon();
+                tryComma();
 
                 if (isPrimitive) {
-                    jsonBuilder.append(arrayUtils.getAsString(i));
+                    jsonBuilder.append(arrayWrapper.getAsString(i));
                 } else {
                     Object item = Array.get(arrayTypeObject, i);
                     parseItem(item);
@@ -118,45 +128,52 @@ public class Serializer {
         });
     }
 
-
-    public void parseMapType(Object mapTypeObject) {
+    @SuppressWarnings("Suppress unchecked cast")
+    private void parseMapType(final Object mapTypeObject) {
         withCirclyBrackets(() -> {
             Map<Object, Object> map = (Map<Object, Object>) mapTypeObject;
             for (Map.Entry<Object, Object> entry : map.entrySet()) {
-                tryColon();
-                jsonBuilder.append(StringUtils.wrapByQuotes(entry.getKey().toString()));
-                jsonBuilder.append(":");
+                tryComma();
+                withQuotes(entry.getKey()::toString);
+                jsonBuilder.append(Serializer.COLON);
                 parseItem(entry.getValue());
             }
         });
     }
 
-    public void parseCollectionType(Object collectionTypeObject) {
+    private void parseCollectionType(final Object collectionTypeObject) {
         withSquareBrackets(() -> {
-            Collection<Object> collection = (Collection<Object>) collectionTypeObject;
+            Collection<?> collection = (Collection<?>) collectionTypeObject;
             for (Object collectionInnerObject : collection) {
-                tryColon();
+                tryComma();
                 parseItem(collectionInnerObject);
             }
         });
     }
 
-    void withSquareBrackets(Runnable runnable) {
+    private void withSquareBrackets(final Runnable runnable) {
         expectColon = false;
-        jsonBuilder.append("[");
+        jsonBuilder.append(Serializer.LEFT_SQUARE_BRACKET);
         runnable.run();
-        jsonBuilder.append("]");
+        jsonBuilder.append(Serializer.RIGHT_SQUARE_BRACKET);
     }
 
-    void withCirclyBrackets(Runnable runnable) {
+    private void withCirclyBrackets(final Runnable runnable) {
         expectColon = false;
-        jsonBuilder.append("{");
+        jsonBuilder.append(Serializer.LEFT_CURLY_BRACE);
         runnable.run();
-        jsonBuilder.append("}");
+        jsonBuilder.append(Serializer.RIGHT_CURLY_BRACE);
     }
 
-    void tryColon() {
-        if (expectColon) jsonBuilder.append(",");
+    private void withQuotes(final Supplier<String> supplier) {
+        jsonBuilder.append(Serializer.QUOTE);
+        jsonBuilder.append(supplier.get());
+        jsonBuilder.append(Serializer.QUOTE);
+    }
+
+    private void tryComma() {
+        if (expectColon) jsonBuilder.append(Serializer.COMMA);
         expectColon = true;
     }
+
 }

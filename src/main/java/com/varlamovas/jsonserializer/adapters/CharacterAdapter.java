@@ -6,14 +6,15 @@ import com.varlamovas.jsonserializer.tokens.Token;
 
 import java.lang.reflect.Field;
 
-public class CharacterAdapter implements ObjectAdapter {
+public class CharacterAdapter implements ObjectAdapter<Character> {
 
     @Override
-    public void fromJson(Token token, Field field, Object instance) {
+    public Character fromJson(Token token, Field field, Object instance) {
         String str = token.getValue();
         assert str.length() == 1;
         Character ch = str.charAt(0);
-        FieldRetriever.setFieldObject(field, instance, ch);
+//        FieldRetriever.setFieldObject(field, instance, ch);
+        return ch;
     }
 
     @Override

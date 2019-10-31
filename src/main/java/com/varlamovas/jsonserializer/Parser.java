@@ -10,12 +10,12 @@ import com.varlamovas.jsonserializer.tokens.Token;
 import java.util.Collection;
 import java.util.function.Consumer;
 
-public class Parser<T> {
+class Parser<T> {
 
     private Lexer lexer;
     private ObjectSeed<T> objectSeed;
 
-    public Parser(CharacterReader reader, ObjectSeed<T> objectSeed) {
+    Parser(CharacterReader reader, ObjectSeed<T> objectSeed) {
         lexer = new Lexer(reader);
         this.objectSeed = objectSeed;
     }
@@ -44,6 +44,16 @@ public class Parser<T> {
         parseCommaSeparated(MarkToken.RIGHT_SQUARE_BRACKET, (token) -> {
             parsePropertyValue(objSeed, propName, token);
         });
+    }
+
+    public void parseValue(ArraySeed seed, Token token) {
+        if (token instanceof ValueToken) {
+            seed.add(token);
+        }
+        if (token.equals(MarkToken.LEFT_SQUARE_BRACKET)) {
+            ArraySeed newCollection = seed.createCollectionSeed();
+            parseArrayBody(newCollection);
+        }
     }
 
     public void parsePropertyValue(BaseSeed seed, String propertyName, Token token) {
