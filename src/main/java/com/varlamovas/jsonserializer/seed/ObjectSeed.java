@@ -71,7 +71,7 @@ public class ObjectSeed implements JSONObject {
         Class<?> clazz = getField(propName).getType();
         Type type = getField(propName).getGenericType();
         if (Map.class.isAssignableFrom(clazz)) {
-            return new MapSeed(clazz, type);
+            return new MapSeed(type);
         }
         return new ObjectSeed(clazz);
     }

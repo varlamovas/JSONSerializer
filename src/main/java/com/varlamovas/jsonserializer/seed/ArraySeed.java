@@ -92,7 +92,7 @@ public class ArraySeed implements JSONArray {
 
         if (Map.class.isAssignableFrom(klass)) {
             Class<? extends Map> klazz = (Class<? extends Map>) ((ParameterizedType) type).getRawType();
-            return new MapSeed(klazz, type);
+            return new MapSeed(type);
         }
         return new ObjectSeed(klass);
     }

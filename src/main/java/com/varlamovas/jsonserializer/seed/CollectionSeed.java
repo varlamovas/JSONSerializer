@@ -12,17 +12,16 @@ import java.util.*;
 
 public class CollectionSeed<T extends Collection> implements JSONArray {
     private Type type;
-    private List<Field> allFields;
     private Class<T> clazz;
     private T instance;
     private List<BaseSeed> seeds = new ArrayList<>();
 
     private List<Token> tokens = new ArrayList<>();
 
-    public CollectionSeed(Class<T> clazz, Type type) {
-        this.clazz = clazz;
+    public CollectionSeed(Type type) {
         this.type = type;
-        this.allFields = null;
+        ParameterizedType parameterizedType = (ParameterizedType) type;
+        this.clazz = (Class<T>) parameterizedType.getRawType();
         newInstance();
     }
 
@@ -117,14 +116,8 @@ public class CollectionSeed<T extends Collection> implements JSONArray {
 
     @Override
     public JSONArray createCollectionSeed() {
-        Class<Collection> clazz;
         Type type = getInnerType();
-        if (type instanceof ParameterizedType) {
-            clazz = (Class<Collection>) ((ParameterizedType) type).getRawType();
-        } else {
-            clazz = (Class<Collection>) type;
-        }
-        return new CollectionSeed<>(clazz, type);
+        return new CollectionSeed<>(type);
     }
 
     @Override
@@ -138,8 +131,7 @@ public class CollectionSeed<T extends Collection> implements JSONArray {
         }
 
         if (Map.class.isAssignableFrom(clazz)) {
-            Class<? extends Map> klass = (Class<? extends Map>) ((ParameterizedType) type).getRawType();
-            return new MapSeed(klass, type);
+            return new MapSeed(type);
         }
         return new ObjectSeed(clazz);
     }
