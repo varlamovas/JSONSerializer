@@ -4,15 +4,12 @@ import com.varlamovas.jsonserializer.adapters.AdapterFactory;
 import com.varlamovas.jsonserializer.adapters.ObjectAdapter;
 import com.varlamovas.jsonserializer.tokens.Token;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-public class MapSeed<T extends Map> implements PropertyValueSeed<T> {
+public class MapSeed<T extends Map> implements JSONObject {
 
     private T instance;
     private final Class<T> clazz;
@@ -20,15 +17,20 @@ public class MapSeed<T extends Map> implements PropertyValueSeed<T> {
     private final Map<String, BaseSeed> propToSeed = new HashMap<>();
     private final Map<String, Token> propToToken = new HashMap<>();
 
-    public MapSeed(Class<T> clazz, Type type) {
+    public MapSeed(Type type) {
         this.clazz = clazz;
         this.type = type;
         newInstance();
     }
 
     @Override
-    public PropertyValueSeed createNewObject(String propertyName) {
-        return null;
+    public JSONObject createNewObject(String propertyName) {
+        Type valueType = getInnerValueType();
+        Class clazz = (Class) valueType;
+        if (Map.class.isAssignableFrom(clazz)) {
+            return new MapSeed(clazz, type);
+        }
+        return new ObjectSeed(clazz);
     }
 
     @Override
@@ -58,15 +60,16 @@ public class MapSeed<T extends Map> implements PropertyValueSeed<T> {
             clazzInnerValueType = (Class<?>) type;
         }
         ObjectAdapter adapter = AdapterFactory.getAdapter(clazzInnerValueType);
-        assert adapter != null;
         for (Map.Entry<String, Token> entry : propToToken.entrySet()) {
 
+            assert adapter != null;
             Object obj = adapter.fromJson(entry.getKey(), entry.getValue(), this);
             instance.put(entry.getKey(), obj);
         }
 
         for (Map.Entry<String, BaseSeed> entry : propToSeed.entrySet()) {
-
+            Object obj = entry.getValue().spawn();
+            instance.put(entry.getKey(), obj);
         }
         return instance;
     }

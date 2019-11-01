@@ -1,11 +1,8 @@
 package com.varlamovas.jsonserializer.adapters;
 
-import com.varlamovas.jsonserializer.FieldRetriever;
 import com.varlamovas.jsonserializer.StringUtils;
-import com.varlamovas.jsonserializer.seed.ArraySeed;
 import com.varlamovas.jsonserializer.seed.CollectionSeed;
 import com.varlamovas.jsonserializer.seed.MapSeed;
-import com.varlamovas.jsonserializer.seed.ObjectSeed;
 import com.varlamovas.jsonserializer.tokens.Token;
 
 import java.lang.reflect.Field;

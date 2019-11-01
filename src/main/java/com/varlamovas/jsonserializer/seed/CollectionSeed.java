@@ -10,7 +10,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.*;
 
-public class CollectionSeed<T extends Collection> implements ArraySeed<T> {
+public class CollectionSeed<T extends Collection> implements JSONArray {
     private Type type;
     private List<Field> allFields;
     private Class<T> clazz;
@@ -116,7 +116,7 @@ public class CollectionSeed<T extends Collection> implements ArraySeed<T> {
     }
 
     @Override
-    public ArraySeed<?> createCollectionSeed() {
+    public JSONArray createCollectionSeed() {
         Class<Collection> clazz;
         Type type = getInnerType();
         if (type instanceof ParameterizedType) {
@@ -128,7 +128,7 @@ public class CollectionSeed<T extends Collection> implements ArraySeed<T> {
     }
 
     @Override
-    public PropertyValueSeed<?> createNewObject() {
+    public JSONObject createNewObject() {
         Class<?> clazz;
         Type type = getInnerType();
         if (type instanceof ParameterizedType) {
@@ -141,7 +141,7 @@ public class CollectionSeed<T extends Collection> implements ArraySeed<T> {
             Class<? extends Map> klass = (Class<? extends Map>) ((ParameterizedType) type).getRawType();
             return new MapSeed(klass, type);
         }
-        return new ObjectSeed<>(clazz);
+        return new ObjectSeed(clazz);
     }
 
     private Type getInnerType() {

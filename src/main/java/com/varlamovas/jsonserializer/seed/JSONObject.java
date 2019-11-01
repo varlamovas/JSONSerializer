@@ -3,11 +3,11 @@ package com.varlamovas.jsonserializer.seed;
 
 import com.varlamovas.jsonserializer.tokens.Token;
 
-public interface PropertyValueSeed<T> extends BaseSeed<T> {
+public interface JSONObject extends BaseSeed {
 
-    PropertyValueSeed createNewObject(String propertyName);
+    JSONObject createNewObject(String propertyName);
 
-    ArraySeed createCollectionSeed(String propertyName);
+    JSONArray createCollectionSeed(String propertyName);
 
     void addCombProperty(String propertyName, BaseSeed newCollection);
 

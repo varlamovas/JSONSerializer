@@ -2,7 +2,6 @@ package com.varlamovas.jsonserializer.seed;
 
 import com.varlamovas.jsonserializer.FieldRetriever;
 import com.varlamovas.jsonserializer.adapters.AdapterFactory;
-import com.varlamovas.jsonserializer.adapters.BaseAdapter;
 import com.varlamovas.jsonserializer.adapters.ObjectAdapter;
 import com.varlamovas.jsonserializer.exceptions.MalformedJSONException;
 import com.varlamovas.jsonserializer.tokens.Token;
@@ -17,36 +16,28 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class ObjectSeed<T> implements PropertyValueSeed<T>{
+public class ObjectSeed implements JSONObject {
 
-    private Class<T> clazz;
+    private Class<?> clazz;
     private Type type;
     private List<Field> allFields;
-    private T instance;
+    private Object instance;
     private HashMap<String, Token> propMapSimple = new HashMap<>();
     private HashMap<String, BaseSeed> propMapComb = new HashMap<>();
 
-    public ObjectSeed(Class<T> clazz, Type type) {
-        this.clazz = clazz;
+    public ObjectSeed(Type type) {
         this.type = type;
+        this.clazz = (Class<?>) type;
         this.allFields = FieldRetriever.getAllFields(clazz);
     }
 
-    public ObjectSeed(Class<T> clazz) {
-        this(clazz, null);
-    }
-
-    public List<Field> getAllFields() {
-        return allFields;
-    }
-
-    public T newInstance() {
+    public Object newInstance() {
         instance = null;
         List<Constructor> constructors = Arrays.asList(clazz.getDeclaredConstructors());
         constructors.forEach(constructor -> constructor.setAccessible(true));
         try {
             try {
-                instance = (T) constructors.get(0).newInstance();
+                instance =  constructors.get(0).newInstance();
             } catch (InvocationTargetException e) {
                 e.printStackTrace();
             }
@@ -67,13 +58,16 @@ public class ObjectSeed<T> implements PropertyValueSeed<T>{
         return findedField.get(0);
     }
 
-    public ArraySeed<?> createCollectionSeed(String propName) {
+    public JSONArray createCollectionSeed(String propName) {
         Class<?> clazz = getField(propName).getType();
         Type type = getField(propName).getGenericType();
+        if (clazz.isArray()) {
+            return new ArraySeed(type);
+        }
         return new CollectionSeed(clazz, type);
     }
 
-    public PropertyValueSeed createNewObject(String propName) {
+    public JSONObject createNewObject(String propName) {
         Class<?> clazz = getField(propName).getType();
         Type type = getField(propName).getGenericType();
         if (Map.class.isAssignableFrom(clazz)) {
@@ -90,15 +84,19 @@ public class ObjectSeed<T> implements PropertyValueSeed<T>{
         propMapComb.put(propertyName, seed);
     }
 
-    public T spawn() {
+    public Object spawn() {
         instance = newInstance();
-        for (Map.Entry<String, Token> entry: propMapSimple.entrySet()) {
+        for (Map.Entry<String, Token> entry : propMapSimple.entrySet()) {
             Field field = getField(entry.getKey());
-            ObjectAdapter adapter = AdapterFactory.getAdapter(field.getType());
-            assert adapter != null;
-            Object obj = adapter.fromJson(entry.getValue(), field, instance);
-            FieldRetriever.setFieldObject(field, instance, obj);
-        } for (Map.Entry<String, BaseSeed> entry: propMapComb.entrySet()) {
+            if (field.getType().isPrimitive()) {
+                AdapterFactory.getPrimitiveAdapter().fromJson(field, instance, entry.getValue());
+            } else {
+                ObjectAdapter adapter = AdapterFactory.getAdapter(field.getType());
+                assert adapter != null;
+                Object obj = adapter.fromJson(entry.getValue(), field, instance);
+                FieldRetriever.setFieldObject(field, instance, obj);
+            }
+        } for (Map.Entry<String, BaseSeed> entry : propMapComb.entrySet()) {
             Field field = getField(entry.getKey());
             BaseSeed seed = entry.getValue();
             FieldRetriever.setFieldObject(field, instance, seed.spawn());

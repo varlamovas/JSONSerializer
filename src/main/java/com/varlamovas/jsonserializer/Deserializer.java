@@ -5,6 +5,7 @@ import com.varlamovas.jsonserializer.readers.CharactersReaderSimple;
 import com.varlamovas.jsonserializer.seed.ObjectSeed;
 
 import java.io.StringReader;
+import java.lang.reflect.Type;
 
 public class Deserializer<T> {
     private String json;
@@ -17,9 +18,9 @@ public class Deserializer<T> {
 
     public T deserialize() {
         CharacterReader stringReader = new CharactersReaderSimple(new StringReader(json));
-        ObjectSeed<T> objectSeed = new ObjectSeed<>(klass);
-        Parser<T> parser = new Parser<>(stringReader, objectSeed);
+        ObjectSeed objectSeed = new ObjectSeed((Type) klass);
+        Parser parser = new Parser(stringReader, objectSeed);
         parser.parse();
-        return objectSeed.spawn();
+        return (T) objectSeed.spawn();
     }
 }

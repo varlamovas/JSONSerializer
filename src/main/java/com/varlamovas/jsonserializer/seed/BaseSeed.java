@@ -2,9 +2,9 @@ package com.varlamovas.jsonserializer.seed;
 
 import com.varlamovas.jsonserializer.tokens.Token;
 
-public interface BaseSeed<T> {
+public interface BaseSeed {
 
-    T spawn();
+    Object spawn();
     default boolean isPropertyValue() {return false;}
     default boolean isCollection() {return false;}
 

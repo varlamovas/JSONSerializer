@@ -29,10 +29,10 @@ class ParserTest {
         StringReader stringReader = new StringReader(json);
         CharactersReaderSimple charReader = new CharactersReaderSimple(stringReader);
         CustomClassForSimpleParserTest initial = CustomClassForSimpleParserTest.getInstance();
-        ObjectSeed<CustomClassForSimpleParserTest> objectSeed = new ObjectSeed<>(CustomClassForSimpleParserTest.class);
-        Parser<CustomClassForSimpleParserTest> parser = new Parser<>(charReader, objectSeed);
+        ObjectSeed objectSeed = new ObjectSeed(CustomClassForSimpleParserTest.class);
+        Parser parser = new Parser(charReader, objectSeed);
         parser.parse();
-        CustomClassForSimpleParserTest deserialized = objectSeed.spawn();
+        CustomClassForSimpleParserTest deserialized = (CustomClassForSimpleParserTest) objectSeed.spawn();
         assertEquals(initial.stringField, deserialized.stringField);
         assertEquals(initial.byteFieldBoxed, deserialized.byteFieldBoxed);
         assertEquals(initial.shortFieldBoxed, deserialized.shortFieldBoxed);

@@ -2,6 +2,7 @@ package com.varlamovas.jsonserializer;
 
 import com.google.gson.Gson;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -12,6 +13,7 @@ public class Performance {
     static JsonSerializer jsonSerializer;
     static Gson gsonSerializer;
     static ClassWithLargeList testClass;
+    static final int repeatCount = 1;
 
     @BeforeEach
     void setUpTest() {
@@ -20,22 +22,22 @@ public class Performance {
         testClass = ClassWithLargeList.getInstanceofClassWithLargeList(1_000_000);
     }
 
-    @Test
+    @RepeatedTest(repeatCount)
     void testPerformanceGson() {
         gsonSerializer.toJson(testClass);
     }
 
-    @Test
+    @RepeatedTest(repeatCount)
     void testPerformanceJsonserializer() {
         jsonSerializer.serialize(testClass);
     }
 
-    @Test
+    @RepeatedTest(repeatCount)
     void testPerformanceGsonDeserialize() {
         gsonSerializer.fromJson(gsonSerializer.toJson(testClass), ClassWithLargeList.class);
     }
 
-    @Test
+    @RepeatedTest(repeatCount)
     void testPerformanceJsonserializerDeserialize() {
         jsonSerializer.deserialize(jsonSerializer.serialize(testClass), ClassWithLargeList.class);
     }

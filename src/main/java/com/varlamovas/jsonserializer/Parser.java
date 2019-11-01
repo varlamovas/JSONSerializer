@@ -7,15 +7,14 @@ import com.varlamovas.jsonserializer.tokens.*;
 import com.varlamovas.jsonserializer.tokens.ValueToken;
 import com.varlamovas.jsonserializer.tokens.Token;
 
-import java.util.Collection;
 import java.util.function.Consumer;
 
-class Parser<T> {
+class Parser {
 
     private Lexer lexer;
-    private ObjectSeed<T> objectSeed;
+    private ObjectSeed objectSeed;
 
-    Parser(CharacterReader reader, ObjectSeed<T> objectSeed) {
+    Parser(CharacterReader reader, ObjectSeed objectSeed) {
         lexer = new Lexer(reader);
         this.objectSeed = objectSeed;
     }
@@ -40,56 +39,45 @@ class Parser<T> {
         }
     }
 
-    public void parseArrayBody(ArraySeed objSeed, String propName) {
+    public void parseArrayBody(JSONArray objSeed) {
         parseCommaSeparated(MarkToken.RIGHT_SQUARE_BRACKET, (token) -> {
-            parsePropertyValue(objSeed, propName, token);
+            parseValue(objSeed, token);
         });
     }
 
-    public void parseValue(ArraySeed seed, Token token) {
+    public void parseValue(JSONArray seed, Token token) {
         if (token instanceof ValueToken) {
             seed.add(token);
         }
         if (token.equals(MarkToken.LEFT_SQUARE_BRACKET)) {
-            ArraySeed newCollection = seed.createCollectionSeed();
+            JSONArray newCollection = seed.createCollectionSeed();
             parseArrayBody(newCollection);
-        }
-    }
-
-    public void parsePropertyValue(BaseSeed seed, String propertyName, Token token) {
-        if (token instanceof ValueToken) {
-            if (seed.isPropertyValue()) {
-                ((PropertyValueSeed) seed).addProperty(propertyName, token);
-            } else if (seed.isCollection()) {
-                ((ArraySeed) seed).add(token);
-            }
-        }
-        if (token.equals(MarkToken.LEFT_SQUARE_BRACKET)) {
-            if (seed.isPropertyValue()) {
-                ArraySeed newCollection = ((PropertyValueSeed) seed).createCollectionSeed(propertyName);
-                parseArrayBody(newCollection, propertyName);
-                ((PropertyValueSeed) seed).addCombProperty(propertyName, newCollection);
-            }
-            else if (seed.isCollection()) {
-                ArraySeed newCollection = ((ArraySeed) seed).createCollectionSeed();
-                parseArrayBody(newCollection, propertyName);
-                ((ArraySeed) seed).addComb(newCollection);
-            }
+            seed.addComb(newCollection);
         }
         if (token.equals(MarkToken.LEFT_CURLY_BRACE)) {
-            if (seed.isPropertyValue()) {
-                PropertyValueSeed newObj = ((PropertyValueSeed) seed).createNewObject(propertyName);
-                parseObjectBody(newObj);
-                ((PropertyValueSeed) seed).addCombProperty(propertyName, newObj);
-            } else if (seed.isCollection()) {
-                PropertyValueSeed newObj = ((ArraySeed) seed).createNewObject();
-                parseObjectBody(newObj);
-                ((ArraySeed) seed).addComb(newObj);
-            }
+            JSONObject propertyValueSeed = seed.createNewObject();
+            parseObjectBody(propertyValueSeed);
+            seed.addComb(propertyValueSeed);
         }
     }
 
-    public void parseObjectBody(PropertyValueSeed objectSeed) {
+    public void parsePropertyValue(JSONObject seed, String propertyName, Token token) {
+        if (token instanceof ValueToken) {
+            seed.addProperty(propertyName, token);
+        }
+        if (token.equals(MarkToken.LEFT_SQUARE_BRACKET)) {
+            JSONArray newCollection = seed.createCollectionSeed(propertyName);
+            parseArrayBody(newCollection);
+            seed.addCombProperty(propertyName, newCollection);
+        }
+        if (token.equals(MarkToken.LEFT_CURLY_BRACE)) {
+            JSONObject newObj = seed.createNewObject(propertyName);
+            parseObjectBody(newObj);
+            seed.addCombProperty(propertyName, newObj);
+        }
+    }
+
+    public void parseObjectBody(JSONObject objectSeed) {
         parseCommaSeparated(MarkToken.RIGHT_CURLY_BRACE, (token) -> {
             if (!(token instanceof StringToken)) {
                 throw new MalformedJSONException("unexpected Token");

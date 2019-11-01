@@ -3,6 +3,7 @@ package com.varlamovas.jsonserializer;
 import com.google.gson.Gson;
 import com.varlamovas.jsonserializer.testobjects.*;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -38,6 +39,9 @@ class SerializerTest {
                 Arguments.of(FooObject.getInstance(), FooObject.getJson()),
                 Arguments.of(ClassWithListOfSimpleObjects.getInstance(), ClassWithListOfSimpleObjects.getJson()),
                 Arguments.of(ClassWithArrayOfIntegersField.getInstance(), ClassWithArrayOfIntegersField.getJson()),
+                Arguments.of(ClassPrimitives.getInstance(), ClassPrimitives.getJson()),
+                Arguments.of(NestedStructure.getInstance(), NestedStructure.getJson()),
+
 //                Arguments.of(ClassWithMapOfClassSimpleToClassSimple.getInstance(), ClassWithMapOfClassSimpleToClassSimple.getJson()),
                 Arguments.of(ClassWithMapOfStringToClassSimple.getInstance(), ClassWithMapOfStringToClassSimple.getJson())
         );
@@ -56,6 +60,7 @@ class SerializerTest {
         assertEquals(expectedResult, actualResult);
     }
 
+    @Disabled("cause it is a GSON checks")
     @ParameterizedTest
     @MethodSource("provideObjectsWithFieldWithDifferentAccessModificators")
     void serializeWithGSON(Object obj, String expectedResult) {

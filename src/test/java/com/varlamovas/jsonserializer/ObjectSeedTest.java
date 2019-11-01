@@ -10,7 +10,7 @@ class ObjectSeedTest {
     @Test
     void newInstanceTest() {
         ClassSimple classSimple = new ClassSimple();
-        ObjectSeed<ClassSimple> objectSeed = new ObjectSeed(classSimple.getClass());
-        ClassSimple classSimpleNew = objectSeed.newInstance();
+        ObjectSeed objectSeed = new ObjectSeed(classSimple.getClass());
+        ClassSimple classSimpleNew = (ClassSimple) objectSeed.newInstance();
     }
 }

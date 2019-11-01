@@ -3,6 +3,7 @@ package com.varlamovas.jsonserializer;
 import com.google.gson.Gson;
 import com.varlamovas.jsonserializer.testobjects.*;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -70,6 +71,7 @@ public class DeserializerTest {
         assertEquals(fooObject.booleanFieldBoxed, deserializedFooObject.booleanFieldBoxed);
     }
 
+    @Disabled
     @Test
     void deserializeWithGSON() {
         CustomClass fooObject = CustomClass.getInstance();
@@ -109,6 +111,7 @@ public class DeserializerTest {
         assertEquals(deserializeClassSimple.stringField, classSimple.stringField);
     }
 
+    @Disabled
     @Test
     void deserializeSimpleGSON() {
         String json = "{\"stringField\":\"stringValue\"}";
@@ -154,6 +157,39 @@ public class DeserializerTest {
         assertIterableEquals(instance.mapStringToClassSimple.values(), deserialized.mapStringToClassSimple.values());
     }
 
+    @Test
+    void deserializeWith_ClassPrimitives() {
+        ClassPrimitives instance = ClassPrimitives.getInstance();
+        String json = jsonSerializer.serialize(instance);
+        ClassPrimitives deserialized = jsonSerializer.deserialize(json, ClassPrimitives.class);
+        assertEquals(ClassPrimitives.getJson(), jsonSerializer.serialize(deserialized));
+    }
+
+    @Test
+    void deserializeWith_ClassWithArrayOfIntegersField() {
+        ClassWithArrayOfIntegersField instance = ClassWithArrayOfIntegersField.getInstance();
+        String json = jsonSerializer.serialize(instance);
+        ClassWithArrayOfIntegersField deserialized = jsonSerializer.deserialize(json, ClassWithArrayOfIntegersField.class);
+        assertEquals(ClassWithArrayOfIntegersField.getJson(), jsonSerializer.serialize(deserialized));
+    }
+
+    @Test
+    void deserializeWith_ClassWithArrayOfClassSimple() {
+        ClassWithArrayOfClassSimple instance = ClassWithArrayOfClassSimple.getInstance();
+        String json = jsonSerializer.serialize(instance);
+        ClassWithArrayOfClassSimple deserialized = jsonSerializer.deserialize(json, ClassWithArrayOfClassSimple.class);
+        assertEquals(ClassWithArrayOfClassSimple.getJson(), jsonSerializer.serialize(deserialized));
+    }
+
+    @Disabled
+    @Test
+    void deserializeWith_NestedStructure() {
+        NestedStructure instance = NestedStructure.getInstance();
+        String json = jsonSerializer.serialize(instance);
+        NestedStructure deserialized = jsonSerializer.deserialize(json, NestedStructure.class);
+        assertEquals(NestedStructure.getJson(), jsonSerializer.serialize(deserialized));
+    }
+
 //    @Test
 //    void deserializeWith_ClassWithMapOfClassSimpleToClassSimple() {
 //        ClassWithMapOfClassSimpleToClassSimple instance = ClassWithMapOfClassSimpleToClassSimple.getInstance();
@@ -163,6 +199,7 @@ public class DeserializerTest {
 //        System.out.println(des);
 //    }
 
+    @Disabled
     @Test
     void GSON_deserializeWith_ClassWithArrayListOfStringField() {
         ClassWithListOfStringField instance = ClassWithListOfStringField.getInstance();
