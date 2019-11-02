@@ -16,11 +16,13 @@ public class Deserializer<T> {
         this.klass = klass;
     }
 
+
     public T deserialize() {
         CharacterReader stringReader = new CharactersReaderSimple(new StringReader(json));
         ObjectSeed objectSeed = new ObjectSeed((Type) klass);
         Parser parser = new Parser(stringReader, objectSeed);
         parser.parse();
-        return (T) objectSeed.spawn();
+        @SuppressWarnings("unchecked") T resultObject = (T) objectSeed.spawn();
+        return resultObject;
     }
 }

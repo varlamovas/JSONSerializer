@@ -1,15 +1,15 @@
 package com.varlamovas.jsonserializer.adapters;
 
-import com.varlamovas.jsonserializer.FieldRetriever;
 import com.varlamovas.jsonserializer.tokens.Token;
 
 import java.lang.reflect.Field;
 
-public class BooleanTypeAdapter implements ObjectAdapter<Boolean> {
+public class ByteAdapter implements ObjectAdapter<Byte> {
+
     @Override
-    public Boolean fromJson(Token token) {
-        Boolean bool = new Boolean(token.getValue());
-        return bool;
+    public Byte fromJson(Token token) {
+        Byte number = new Byte(token.getValue());
+        return number;
     }
 
     @Override

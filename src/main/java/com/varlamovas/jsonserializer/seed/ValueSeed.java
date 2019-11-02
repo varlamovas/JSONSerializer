@@ -2,7 +2,7 @@ package com.varlamovas.jsonserializer.seed;
 
 import com.varlamovas.jsonserializer.tokens.Token;
 
-public class ValueSeed implements BaseSeed {
+public class ValueSeed extends BaseSeed {
 
     private final Token token;
 

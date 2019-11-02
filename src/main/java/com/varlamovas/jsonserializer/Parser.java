@@ -50,14 +50,12 @@ class Parser {
             seed.add(token);
         }
         if (token.equals(MarkToken.LEFT_SQUARE_BRACKET)) {
-            JSONArray newCollection = seed.createCollectionSeed();
+            JSONArray newCollection = seed.createJSONArray();
             parseArrayBody(newCollection);
-            seed.addComb(newCollection);
         }
         if (token.equals(MarkToken.LEFT_CURLY_BRACE)) {
-            JSONObject propertyValueSeed = seed.createNewObject();
+            JSONObject propertyValueSeed = seed.createJSONObject();
             parseObjectBody(propertyValueSeed);
-            seed.addComb(propertyValueSeed);
         }
     }
 
@@ -66,14 +64,12 @@ class Parser {
             seed.addProperty(propertyName, token);
         }
         if (token.equals(MarkToken.LEFT_SQUARE_BRACKET)) {
-            JSONArray newCollection = seed.createCollectionSeed(propertyName);
+            JSONArray newCollection = seed.createJSONArray(propertyName);
             parseArrayBody(newCollection);
-            seed.addCombProperty(propertyName, newCollection);
         }
         if (token.equals(MarkToken.LEFT_CURLY_BRACE)) {
-            JSONObject newObj = seed.createNewObject(propertyName);
+            JSONObject newObj = seed.createJSONObject(propertyName);
             parseObjectBody(newObj);
-            seed.addCombProperty(propertyName, newObj);
         }
     }
 

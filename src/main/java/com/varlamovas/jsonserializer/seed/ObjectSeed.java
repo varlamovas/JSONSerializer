@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class ObjectSeed implements JSONObject {
+public class ObjectSeed extends JSONObject {
 
     private Class<?> clazz;
     private Type type;
@@ -37,13 +37,11 @@ public class ObjectSeed implements JSONObject {
         constructors.forEach(constructor -> constructor.setAccessible(true));
         try {
             try {
-                instance =  constructors.get(0).newInstance();
+                instance = constructors.get(0).newInstance();
             } catch (InvocationTargetException e) {
                 e.printStackTrace();
             }
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
+        } catch (InstantiationException | IllegalAccessException e) {
             e.printStackTrace();
         }
         return instance;
@@ -58,22 +56,18 @@ public class ObjectSeed implements JSONObject {
         return findedField.get(0);
     }
 
-    public JSONArray createCollectionSeed(String propName) {
-        Class<?> clazz = getField(propName).getType();
-        Type type = getField(propName).getGenericType();
-        if (clazz.isArray()) {
-            return new ArraySeed(type);
-        }
-        return new CollectionSeed(clazz, type);
+    public JSONArray createJSONArray(String propName) {
+        Type fieldType = getField(propName).getGenericType();
+        JSONArray jsonArray = createJSONArrayByType(fieldType);
+        propMapComb.put(propName, jsonArray);
+        return jsonArray;
     }
 
-    public JSONObject createNewObject(String propName) {
-        Class<?> clazz = getField(propName).getType();
-        Type type = getField(propName).getGenericType();
-        if (Map.class.isAssignableFrom(clazz)) {
-            return new MapSeed(type);
-        }
-        return new ObjectSeed(clazz);
+    public JSONObject createJSONObject(String propName) {
+        Type fieldType = getField(propName).getGenericType();
+        JSONObject jsonObject = createJSONObjectByType(fieldType);
+        propMapComb.put(propName, jsonObject);
+        return jsonObject;
     }
 
     public void addProperty(String propertyName, Token token) {
@@ -93,10 +87,11 @@ public class ObjectSeed implements JSONObject {
             } else {
                 ObjectAdapter adapter = AdapterFactory.getAdapter(field.getType());
                 assert adapter != null;
-                Object obj = adapter.fromJson(entry.getValue(), field, instance);
+                Object obj = adapter.fromJson(entry.getValue());
                 FieldRetriever.setFieldObject(field, instance, obj);
             }
-        } for (Map.Entry<String, BaseSeed> entry : propMapComb.entrySet()) {
+        }
+        for (Map.Entry<String, BaseSeed> entry : propMapComb.entrySet()) {
             Field field = getField(entry.getKey());
             BaseSeed seed = entry.getValue();
             FieldRetriever.setFieldObject(field, instance, seed.spawn());
@@ -104,13 +99,4 @@ public class ObjectSeed implements JSONObject {
         return instance;
     }
 
-    @Override
-    public boolean isPropertyValue() {
-        return true;
-    }
-
-    @Override
-    public boolean isCollection() {
-        return false;
-    }
 }

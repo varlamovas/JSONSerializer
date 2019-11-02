@@ -9,10 +9,10 @@ import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MapSeed<T extends Map> implements JSONObject {
+public class MapSeed extends JSONObject {
 
-    private T instance;
-    private final Class<T> clazz;
+    private Map<Object, Object> instance;
+    private final Class<?> clazz;
     private final Type type;
     private final Map<String, BaseSeed> propToSeed = new HashMap<>();
     private final Map<String, Token> propToToken = new HashMap<>();
@@ -20,23 +20,24 @@ public class MapSeed<T extends Map> implements JSONObject {
     public MapSeed(Type type) {
         this.type = type;
         ParameterizedType parameterizedType = (ParameterizedType) type;
-        this.clazz = (Class<T>) parameterizedType.getRawType();
+        this.clazz = (Class<?>) parameterizedType.getRawType();
         newInstance();
     }
 
     @Override
-    public JSONObject createNewObject(String propertyName) {
+    public JSONObject createJSONObject(String propertyName) {
         Type valueType = getInnerValueType();
-        Class clazz = (Class) valueType;
-        if (Map.class.isAssignableFrom(clazz)) {
-            return new MapSeed(type);
-        }
-        return new ObjectSeed(clazz);
+        JSONObject jsonObject = createJSONObjectByType(valueType);
+        propToSeed.put(propertyName, jsonObject);
+        return jsonObject;
     }
 
     @Override
-    public CollectionSeed createCollectionSeed(String name) {
-        return null;
+    public JSONArray createJSONArray(String propertyName) {
+        Type valueType = getInnerValueType();
+        JSONArray jsonArray = createJSONArrayByType(valueType);
+        propToSeed.put(propertyName, jsonArray);
+        return jsonArray;
     }
 
     @Override
@@ -50,7 +51,7 @@ public class MapSeed<T extends Map> implements JSONObject {
     }
 
     @Override
-    public T spawn() {
+    public Map<Object, Object> spawn() {
         instance = newInstance();
 
         Class<?> clazzInnerValueType;
@@ -64,7 +65,7 @@ public class MapSeed<T extends Map> implements JSONObject {
         for (Map.Entry<String, Token> entry : propToToken.entrySet()) {
 
             assert adapter != null;
-            Object obj = adapter.fromJson(entry.getKey(), entry.getValue(), this);
+            Object obj = adapter.fromJson(entry.getValue());
             instance.put(entry.getKey(), obj);
         }
 
@@ -75,30 +76,18 @@ public class MapSeed<T extends Map> implements JSONObject {
         return instance;
     }
 
-    @Override
-    public boolean isPropertyValue() {
-        return true;
-    }
-
-    @Override
-    public boolean isCollection() {
-        return false;
-    }
-
-    private T newInstance() {
+    private Map<Object, Object> newInstance() {
         instance = null;
         if (clazz.isInterface()) {
             if (Map.class.isAssignableFrom(clazz)) {
-                instance = (T) new HashMap<>();
+                instance = new HashMap<>();
                 return instance;
             }
         }
 
         try {
-            instance = clazz.newInstance();
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
+            instance = (Map<Object, Object>) clazz.newInstance();
+        } catch (InstantiationException | IllegalAccessException e) {
             e.printStackTrace();
         }
         return instance;
@@ -113,7 +102,7 @@ public class MapSeed<T extends Map> implements JSONObject {
         return innerType;
     }
 
-    public T getInstance() {
+    public Map<Object, Object> getInstance() {
         assert instance != null;
         return instance;
     }

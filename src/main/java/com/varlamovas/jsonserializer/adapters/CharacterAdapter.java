@@ -9,11 +9,10 @@ import java.lang.reflect.Field;
 public class CharacterAdapter implements ObjectAdapter<Character> {
 
     @Override
-    public Character fromJson(Token token, Field field, Object instance) {
+    public Character fromJson(Token token) {
         String str = token.getValue();
         assert str.length() == 1;
         Character ch = str.charAt(0);
-//        FieldRetriever.setFieldObject(field, instance, ch);
         return ch;
     }
 

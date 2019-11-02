@@ -1,7 +1,7 @@
 package com.varlamovas.jsonserializer.tokens;
 
-public class NumberToken extends ValueToken {
-    public NumberToken(String value) {
+public abstract class NumberToken extends ValueToken {
+    protected NumberToken(String value) {
         super(value);
     }
 }

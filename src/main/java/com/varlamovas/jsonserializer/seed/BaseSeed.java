@@ -1,26 +1,44 @@
 package com.varlamovas.jsonserializer.seed;
 
-import com.varlamovas.jsonserializer.tokens.Token;
 
-public interface BaseSeed {
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.Collection;
+import java.util.Map;
 
-    Object spawn();
-    default boolean isPropertyValue() {return false;}
-    default boolean isCollection() {return false;}
+public abstract class BaseSeed {
 
-//    public abstract void addProperty(String propertyName, Token token);
-//    public abstract CollectionSeed createCollectionSeed(String name);
-//    public abstract void addCombProperty(String propertyName, BaseSeed seed);
-//
-//    public abstract Object spawn();
+    public abstract Object spawn();
 
-//    public ObjectSeed createCollectionSeed(String propName) {
-//        Class<?> clazz = getField(propName).getClass();
-//        return new ObjectSeed(clazz);
-//    }
-//
-//    public ObjectSeed createNewObject(String propName) {
-//        Class<?> clazz = getField(propName).getClass();
-//        return new ObjectSeed(clazz);
-//    }
+    JSONObject createJSONObjectByType(Type type) {
+        Class<?> clazz;
+        if (type instanceof ParameterizedType) {
+            ParameterizedType pType = (ParameterizedType) type;
+            clazz = (Class<?>) pType.getRawType();
+        } else {
+            clazz = (Class<?>) type;
+        }
+        if (Map.class.isAssignableFrom(clazz)) {
+            return new MapSeed(type);
+        }
+        return new ObjectSeed(type);
+    }
+
+    JSONArray createJSONArrayByType(Type type) {
+        Class<?> clazz;
+        if (type instanceof ParameterizedType) {
+            ParameterizedType pType = (ParameterizedType) type;
+            clazz = (Class<?>) pType.getRawType();
+        } else {
+            clazz = (Class<?>) type;
+        }
+        if (clazz.isArray()) {
+            return new ArraySeed(type);
+        }
+        if (Collection.class.isAssignableFrom(clazz)) {
+            return new CollectionSeed(type);
+        }
+        throw new IllegalStateException();
+    }
+
 }
