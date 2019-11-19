@@ -2,6 +2,7 @@ package com.varlamovas.jsonserializer;
 
 import com.google.gson.Gson;
 import com.varlamovas.jsonserializer.readers.CharactersReaderSimple;
+import com.varlamovas.jsonserializer.readers.ReaderChars;
 import com.varlamovas.jsonserializer.seed.ObjectSeed;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,9 +28,11 @@ class ParserTest {
     void parseCommaSeparated() {
         String json = "{\"stringField\":\"stringFieldValue\",\"byteFieldBoxed\":127,\"shortFieldBoxed\":32767,\"charFieldBoxed\":\"c\",\"intFieldBoxed\":2147483647,\"longFieldBoxed\":9223372036854775807,\"floatFieldBoxed\":3.4E38,\"doubleFieldBoxed\":1.7E308,\"booleanFieldBoxed\":true}";
         StringReader stringReader = new StringReader(json);
-        CharactersReaderSimple charReader = new CharactersReaderSimple(stringReader);
+//        CharactersReaderSimple charReader = new CharactersReaderSimple(stringReader);
+        ReaderChars charReader = new ReaderChars(stringReader);
         CustomClassForSimpleParserTest initial = CustomClassForSimpleParserTest.getInstance();
         ObjectSeed objectSeed = new ObjectSeed(CustomClassForSimpleParserTest.class);
+//        Parser parser = new Parser(charReader, objectSeed);
         Parser parser = new Parser(charReader, objectSeed);
         parser.parse();
         CustomClassForSimpleParserTest deserialized = (CustomClassForSimpleParserTest) objectSeed.spawn();

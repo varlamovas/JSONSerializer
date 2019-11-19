@@ -21,7 +21,7 @@ public class CollectionSeed extends JSONArray {
         this.type = type;
         ParameterizedType parameterizedType = (ParameterizedType) type;
         this.clazz = (Class<?>) parameterizedType.getRawType();
-        newInstance();
+        this.instance = newInstance();
     }
 
     public Collection<Object> newInstance() {
@@ -44,18 +44,6 @@ public class CollectionSeed extends JSONArray {
     }
 
     public void add(Token token) {
-        tokens.add(token);
-    }
-
-    public void addComb(BaseSeed seed) {
-        seeds.add(seed);
-    }
-
-    public Collection<Object> getInstance() {
-        return instance;
-    }
-
-    public Collection<Object> spawn() {
         Class<?> clazzInnerType;
         Type type = getInnerType();
         if (type instanceof ParameterizedType) {
@@ -64,14 +52,37 @@ public class CollectionSeed extends JSONArray {
             clazzInnerType = (Class<?>) type;
         }
         ObjectAdapter adapter = AdapterFactory.getAdapter(clazzInnerType);
-        for (Token token : tokens) {
-            assert adapter != null;
-            Object obj = adapter.fromJson(token);
-            instance.add(obj);
-        }
-        for (BaseSeed seed : seeds) {
-            instance.add(seed.spawn());
-        }
+        assert adapter != null;
+        Object obj = adapter.fromJson(token);
+        instance.add(obj);
+    }
+
+    public void addComb(BaseSeed seed) {
+//        seeds.add(seed);
+        instance.add(seed.spawn());
+    }
+
+    public Collection<Object> getInstance() {
+        return instance;
+    }
+
+    public Collection<Object> spawn() {
+//        Class<?> clazzInnerType;
+//        Type type = getInnerType();
+//        if (type instanceof ParameterizedType) {
+//            clazzInnerType = (Class<?>) ((ParameterizedType) type).getRawType();
+//        } else {
+//            clazzInnerType = (Class<?>) type;
+//        }
+//        ObjectAdapter adapter = AdapterFactory.getAdapter(clazzInnerType);
+//        for (Token token : tokens) {
+//            assert adapter != null;
+//            Object obj = adapter.fromJson(token);
+//            instance.add(obj);
+//        }
+//        for (BaseSeed seed : seeds) {
+//            instance.add(seed.spawn());
+//        }
         return instance;
     }
 
@@ -79,7 +90,7 @@ public class CollectionSeed extends JSONArray {
     public JSONArray createJSONArray() {
         Type type = getInnerType();
         JSONArray jsonArray = createJSONArrayByType(type);
-        seeds.add(jsonArray);
+//        seeds.add(jsonArray);
         return jsonArray;
     }
 
@@ -87,7 +98,7 @@ public class CollectionSeed extends JSONArray {
     public JSONObject createJSONObject() {
         Type type = getInnerType();
         JSONObject jsonObject = createJSONObjectByType(type);
-        seeds.add(jsonObject);
+//        seeds.add(jsonObject);
         return jsonObject;
     }
 

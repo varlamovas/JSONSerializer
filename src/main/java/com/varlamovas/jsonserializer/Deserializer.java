@@ -2,9 +2,11 @@ package com.varlamovas.jsonserializer;
 
 import com.varlamovas.jsonserializer.readers.CharacterReader;
 import com.varlamovas.jsonserializer.readers.CharactersReaderSimple;
+import com.varlamovas.jsonserializer.readers.ReaderChars;
 import com.varlamovas.jsonserializer.seed.ObjectSeed;
 
 import java.io.StringReader;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
 public class Deserializer<T> {
@@ -18,9 +20,14 @@ public class Deserializer<T> {
 
 
     public T deserialize() {
-        CharacterReader stringReader = new CharactersReaderSimple(new StringReader(json));
         ObjectSeed objectSeed = new ObjectSeed((Type) klass);
-        Parser parser = new Parser(stringReader, objectSeed);
+
+//        CharacterReader stringReader = new CharactersReaderSimple(new StringReader(json));
+//        Parser parser = new Parser(stringReader, objectSeed);
+
+        ReaderChars readerChars = new ReaderChars(new StringReader(json));
+        Parser parser = new Parser(readerChars, objectSeed);
+
         parser.parse();
         @SuppressWarnings("unchecked") T resultObject = (T) objectSeed.spawn();
         return resultObject;

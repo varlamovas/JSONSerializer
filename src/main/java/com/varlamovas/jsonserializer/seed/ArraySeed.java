@@ -54,7 +54,7 @@ public class ArraySeed extends JSONArray {
     public JSONArray createJSONArray() {
         Type type = clazz.getComponentType();
         JSONArray jsonArray = createJSONArrayByType(type);
-        seeds.add(jsonArray);
+//        seeds.add(jsonArray);
         return jsonArray;
     }
 
@@ -62,7 +62,7 @@ public class ArraySeed extends JSONArray {
     public JSONObject createJSONObject() {
         Type type = clazz.getComponentType();
         JSONObject jsonObject = createJSONObjectByType(type);
-        seeds.add(jsonObject);
+//        seeds.add(jsonObject);
         return jsonObject;
     }
 

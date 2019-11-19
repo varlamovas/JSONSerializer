@@ -190,6 +190,30 @@ public class DeserializerTest {
         assertEquals(NestedStructure.getJson(), jsonSerializer.serialize(deserialized));
     }
 
+    @Test
+    void deserializeWith_ClassWithMapOfStringToListOfString() {
+        ClassWithMapOfStringToListOfString instance = ClassWithMapOfStringToListOfString.getInstance();
+        String json = jsonSerializer.serialize(instance);
+        ClassWithMapOfStringToListOfString deserizlized = jsonSerializer.deserialize(json, ClassWithMapOfStringToListOfString.class);
+        assertEquals(ClassWithMapOfStringToListOfString.getJson(), jsonSerializer.serialize(deserizlized));
+    }
+
+    @Test
+    void deserizlizeWith_ClassWithTransientField() {
+        ClassWithTransientField instance = ClassWithTransientField.getInstance();
+        String json = jsonSerializer.serialize(instance);
+        ClassWithTransientField deserialized = jsonSerializer.deserialize(json, ClassWithTransientField.class);
+        assertEquals(ClassWithTransientField.getJson(), jsonSerializer.serialize(deserialized));
+    }
+
+    @Test
+    void deserizlizeWith_ClassWithAnotatedField() {
+        ClassWithAnotatedField instance = new ClassWithAnotatedField();
+        String json = jsonSerializer.serialize(instance);
+        ClassWithAnotatedField deserialized = jsonSerializer.deserialize(json, ClassWithAnotatedField.class);
+
+    }
+
 //    @Test
 //    void deserializeWith_ClassWithMapOfClassSimpleToClassSimple() {
 //        ClassWithMapOfClassSimpleToClassSimple instance = ClassWithMapOfClassSimpleToClassSimple.getInstance();

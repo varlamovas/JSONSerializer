@@ -28,7 +28,7 @@ public class MapSeed extends JSONObject {
     public JSONObject createJSONObject(String propertyName) {
         Type valueType = getInnerValueType();
         JSONObject jsonObject = createJSONObjectByType(valueType);
-        propToSeed.put(propertyName, jsonObject);
+//        propToSeed.put(propertyName, jsonObject);
         return jsonObject;
     }
 
@@ -36,7 +36,7 @@ public class MapSeed extends JSONObject {
     public JSONArray createJSONArray(String propertyName) {
         Type valueType = getInnerValueType();
         JSONArray jsonArray = createJSONArrayByType(valueType);
-        propToSeed.put(propertyName, jsonArray);
+//        propToSeed.put(propertyName, jsonArray);
         return jsonArray;
     }
 

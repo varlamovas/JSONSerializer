@@ -2,6 +2,8 @@ package com.varlamovas.jsonserializer;
 
 import com.varlamovas.jsonserializer.exceptions.MalformedJSONException;
 import com.varlamovas.jsonserializer.readers.CharacterReader;
+import com.varlamovas.jsonserializer.readers.CharactersReaderSimple;
+import com.varlamovas.jsonserializer.readers.ReaderChars;
 import com.varlamovas.jsonserializer.seed.*;
 import com.varlamovas.jsonserializer.tokens.*;
 import com.varlamovas.jsonserializer.tokens.ValueToken;
@@ -11,13 +13,17 @@ import java.util.function.Consumer;
 
 class Parser {
 
-    private Lexer lexer;
+    private LexerChars lexer;
+//    private Lexer lexer;
     private ObjectSeed objectSeed;
 
-    Parser(CharacterReader reader, ObjectSeed objectSeed) {
-        lexer = new Lexer(reader);
+    Parser(ReaderChars reader, ObjectSeed objectSeed) {
+        lexer = new LexerChars(reader);
+//        this.lexer = new Lexer(reader);
         this.objectSeed = objectSeed;
     }
+
+
 
     private void expect(Token token) {
         if (lexer.nextToken() != token) throw new IllegalArgumentException();
@@ -52,10 +58,12 @@ class Parser {
         if (token.equals(MarkToken.LEFT_SQUARE_BRACKET)) {
             JSONArray newCollection = seed.createJSONArray();
             parseArrayBody(newCollection);
+            seed.addComb(newCollection);
         }
         if (token.equals(MarkToken.LEFT_CURLY_BRACE)) {
             JSONObject propertyValueSeed = seed.createJSONObject();
             parseObjectBody(propertyValueSeed);
+            seed.addComb(propertyValueSeed);
         }
     }
 
@@ -66,10 +74,12 @@ class Parser {
         if (token.equals(MarkToken.LEFT_SQUARE_BRACKET)) {
             JSONArray newCollection = seed.createJSONArray(propertyName);
             parseArrayBody(newCollection);
+            seed.addCombProperty(propertyName, newCollection);
         }
         if (token.equals(MarkToken.LEFT_CURLY_BRACE)) {
             JSONObject newObj = seed.createJSONObject(propertyName);
             parseObjectBody(newObj);
+            seed.addCombProperty(propertyName, newObj);
         }
     }
 

@@ -1,7 +1,9 @@
 package com.varlamovas.jsonserializer;
 
 import com.google.gson.Gson;
+import com.varlamovas.jsonserializer.testobjects.BigNestedStructure;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 
@@ -19,27 +21,43 @@ public class Performance {
     void setUpTest() {
         jsonSerializer = new JsonSerializer();
         gsonSerializer = new Gson();
-        testClass = ClassWithLargeList.getInstanceofClassWithLargeList(1_000_000);
+        testClass = ClassWithLargeList.getInstanceofClassWithLargeList(800_000);
     }
 
+//    @Disabled
     @RepeatedTest(repeatCount)
     void testPerformanceGson() {
         gsonSerializer.toJson(testClass);
     }
 
+//    @Disabled
     @RepeatedTest(repeatCount)
     void testPerformanceJsonserializer() {
         jsonSerializer.serialize(testClass);
     }
 
+//    @Disabled
     @RepeatedTest(repeatCount)
     void testPerformanceGsonDeserialize() {
         gsonSerializer.fromJson(gsonSerializer.toJson(testClass), ClassWithLargeList.class);
     }
 
+//    @Disabled
     @RepeatedTest(repeatCount)
     void testPerformanceJsonserializerDeserialize() {
         jsonSerializer.deserialize(jsonSerializer.serialize(testClass), ClassWithLargeList.class);
+    }
+
+    @Test
+    void testPerformance_GSON_BigNestedStructure() {
+        BigNestedStructure instance = BigNestedStructure.getInstance();
+        gsonSerializer.fromJson(gsonSerializer.toJson(instance), BigNestedStructure.class);
+    }
+
+    @Test
+    void testPerformance_JSONSerializer_BigNestedStructure() {
+        BigNestedStructure instance = BigNestedStructure.getInstance();
+        jsonSerializer.deserialize(jsonSerializer.serialize(instance), BigNestedStructure.class);
     }
 
 //    @Test
