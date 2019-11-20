@@ -1,35 +1,32 @@
 package com.varlamovas.jsonserializer;
 
 import com.varlamovas.jsonserializer.exceptions.MalformedJSONException;
-import com.varlamovas.jsonserializer.readers.CharacterReader;
-import com.varlamovas.jsonserializer.readers.CharactersReaderSimple;
 import com.varlamovas.jsonserializer.readers.ReaderChars;
-import com.varlamovas.jsonserializer.seed.*;
-import com.varlamovas.jsonserializer.tokens.*;
-import com.varlamovas.jsonserializer.tokens.ValueToken;
+import com.varlamovas.jsonserializer.seed.JSONArray;
+import com.varlamovas.jsonserializer.seed.JSONObject;
+import com.varlamovas.jsonserializer.seed.ObjectSeed;
+import com.varlamovas.jsonserializer.tokens.MarkToken;
+import com.varlamovas.jsonserializer.tokens.StringToken;
 import com.varlamovas.jsonserializer.tokens.Token;
+import com.varlamovas.jsonserializer.tokens.ValueToken;
 
 import java.util.function.Consumer;
 
 class Parser {
 
-    private LexerChars lexer;
-//    private Lexer lexer;
+    private Lexer lexer;
     private ObjectSeed objectSeed;
 
     Parser(ReaderChars reader, ObjectSeed objectSeed) {
-        lexer = new LexerChars(reader);
-//        this.lexer = new Lexer(reader);
+        lexer = new Lexer(reader);
         this.objectSeed = objectSeed;
     }
-
-
 
     private void expect(Token token) {
         if (lexer.nextToken() != token) throw new IllegalArgumentException();
     }
 
-    public void parseCommaSeparated(Token stopToken, Consumer<Token> body) {
+    private void parseCommaSeparated(Token stopToken, Consumer<Token> body) {
         boolean expectComma = false;
         while (true) {
             Token token = lexer.nextToken();
@@ -45,13 +42,11 @@ class Parser {
         }
     }
 
-    public void parseArrayBody(JSONArray objSeed) {
-        parseCommaSeparated(MarkToken.RIGHT_SQUARE_BRACKET, (token) -> {
-            parseValue(objSeed, token);
-        });
+    private void parseArrayBody(JSONArray objSeed) {
+        parseCommaSeparated(MarkToken.RIGHT_SQUARE_BRACKET, (token) -> parseValue(objSeed, token));
     }
 
-    public void parseValue(JSONArray seed, Token token) {
+    private void parseValue(JSONArray seed, Token token) {
         if (token instanceof ValueToken) {
             seed.add(token);
         }
@@ -67,7 +62,7 @@ class Parser {
         }
     }
 
-    public void parsePropertyValue(JSONObject seed, String propertyName, Token token) {
+    private void parsePropertyValue(JSONObject seed, String propertyName, Token token) {
         if (token instanceof ValueToken) {
             seed.addProperty(propertyName, token);
         }
@@ -83,7 +78,7 @@ class Parser {
         }
     }
 
-    public void parseObjectBody(JSONObject objectSeed) {
+    private void parseObjectBody(JSONObject objectSeed) {
         parseCommaSeparated(MarkToken.RIGHT_CURLY_BRACE, (token) -> {
             if (!(token instanceof StringToken)) {
                 throw new MalformedJSONException("unexpected Token");

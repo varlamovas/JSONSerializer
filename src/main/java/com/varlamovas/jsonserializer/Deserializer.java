@@ -1,12 +1,9 @@
 package com.varlamovas.jsonserializer;
 
-import com.varlamovas.jsonserializer.readers.CharacterReader;
-import com.varlamovas.jsonserializer.readers.CharactersReaderSimple;
 import com.varlamovas.jsonserializer.readers.ReaderChars;
 import com.varlamovas.jsonserializer.seed.ObjectSeed;
 
 import java.io.StringReader;
-import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
 public class Deserializer<T> {

@@ -1,10 +1,7 @@
 package com.varlamovas.jsonserializer.adapters;
 
-import com.varlamovas.jsonserializer.FieldRetriever;
 import com.varlamovas.jsonserializer.StringUtils;
 import com.varlamovas.jsonserializer.tokens.Token;
-
-import java.lang.reflect.Field;
 
 public class CharacterAdapter implements ObjectAdapter<Character> {
 

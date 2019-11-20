@@ -1,7 +1,6 @@
 package com.varlamovas.jsonserializer.testobjects;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class ClassWithArrayListOfStringField implements BaseObject {
     public ArrayList<String> listOfStrings;

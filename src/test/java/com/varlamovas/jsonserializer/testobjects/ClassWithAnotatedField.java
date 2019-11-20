@@ -16,4 +16,5 @@ public class ClassWithAnotatedField {
         instance.setFields();
         return instance;
     }
+
 }

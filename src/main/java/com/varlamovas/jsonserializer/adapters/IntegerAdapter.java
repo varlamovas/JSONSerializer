@@ -2,8 +2,6 @@ package com.varlamovas.jsonserializer.adapters;
 
 import com.varlamovas.jsonserializer.tokens.Token;
 
-import java.lang.reflect.Field;
-
 public class IntegerAdapter implements ObjectAdapter<Integer> {
 
     @Override

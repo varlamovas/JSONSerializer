@@ -53,4 +53,25 @@ class ReaderCharsTest {
         assertEquals('"', (char) charactersReader.readNext());
         assertEquals('t', (char) charactersReader.readNext());
     }
+
+    @Test
+    void test_of_end__readNext() {
+        StringReader stringReader = new StringReader("0");
+        ReaderChars charactersReader = new ReaderChars(stringReader);
+        int i = charactersReader.readNext();
+        i = charactersReader.readNext();
+        i = charactersReader.readNext();
+        assertEquals(-1, i);
+    }
+
+    @Test
+    void test_of_end__peekNext() {
+        StringReader stringReader = new StringReader("a");
+        ReaderChars readerChars = new ReaderChars(stringReader);
+        int i;
+        i = readerChars.readNext();
+        i = readerChars.peekNext();
+        i = readerChars.peekNext();
+        assertEquals(-1, i);
+    }
 }

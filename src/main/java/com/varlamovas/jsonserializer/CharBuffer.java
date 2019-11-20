@@ -38,8 +38,7 @@ public class CharBuffer {
     }
 
     public Boolean isEmpty() {
-        if (pointer == 0) return true;
-        return false;
+        return pointer == 0;
     }
 
     public Boolean isNotEmpty() {

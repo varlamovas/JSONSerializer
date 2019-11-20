@@ -6,7 +6,6 @@ import org.junit.jupiter.api.*;
 import java.io.StringReader;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class CharactersReaderSimpleTest {
 

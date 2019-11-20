@@ -18,7 +18,9 @@ public class FieldRetriever {
     }
 
     public static <T> List<Field> getAllFields(Class<T> clazz) {
-        List<Field> declaredFields = Arrays.stream(clazz.getDeclaredFields()).filter(f -> !Modifier.isStatic(f.getModifiers())).collect(Collectors.toList());
+        List<Field> declaredFields = Arrays.stream(clazz.getDeclaredFields())
+                .filter(f -> !Modifier.isStatic(f.getModifiers()))
+                .collect(Collectors.toList());
         List<Field> allSuperClassesFields = getAllSuperClassesFields(clazz);
         declaredFields.addAll(allSuperClassesFields);
         declaredFields.forEach((field) -> field.setAccessible(true));
@@ -29,7 +31,8 @@ public class FieldRetriever {
         Stream<Field> allSuperClassesFields = Stream.empty();
         List<Class> allSuperClasses = getAllSuperClasses(clazz);
         for (Class superClazz : allSuperClasses) {
-            allSuperClassesFields = Stream.concat(allSuperClassesFields, Arrays.stream(superClazz.getDeclaredFields()).filter(f -> !Modifier.isStatic(f.getModifiers())));
+            allSuperClassesFields = Stream.concat(allSuperClassesFields, Arrays.stream(superClazz.getDeclaredFields())
+                    .filter(f -> !Modifier.isStatic(f.getModifiers())));
         }
         return allSuperClassesFields.collect(Collectors.toList());
     }

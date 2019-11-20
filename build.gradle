@@ -1,11 +1,12 @@
 plugins {
-    id 'java'
+    id 'java-library'
 }
 
 group 'com.varlamovas.jsonserializer'
 version '1.0-SNAPSHOT'
 
 sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
 repositories {
     mavenCentral()
@@ -20,7 +21,6 @@ dependencies {
 test {
     testLogging {
         events "passed", "skipped", "failed"
-
     }
     useJUnitPlatform()
 }

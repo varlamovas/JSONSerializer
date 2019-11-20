@@ -1,13 +1,11 @@
 package com.varlamovas.jsonserializer;
 
 import com.google.gson.Gson;
-import com.varlamovas.jsonserializer.readers.CharactersReaderSimple;
 import com.varlamovas.jsonserializer.readers.ReaderChars;
 import com.varlamovas.jsonserializer.seed.ObjectSeed;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.io.Reader;
 import java.io.StringReader;
 import java.util.Arrays;
 import java.util.List;

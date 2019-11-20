@@ -1,7 +1,7 @@
 package com.varlamovas.jsonserializer;
 
 import com.varlamovas.jsonserializer.exceptions.MalformedJSONException;
-import com.varlamovas.jsonserializer.readers.CharactersReaderSimple;
+import com.varlamovas.jsonserializer.readers.ReaderChars;
 import com.varlamovas.jsonserializer.tokens.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,8 +24,8 @@ class LexerTest {
     @BeforeEach
     void setUpTest() {
         StringReader stringReader = new StringReader("{\n  \"test\": 42\n}");
-        CharactersReaderSimple charReader = new CharactersReaderSimple(stringReader);
-        lexer = new Lexer(charReader);
+        ReaderChars readerChars = new ReaderChars(stringReader);
+        lexer = new Lexer(readerChars);
     }
 
 
@@ -63,8 +63,8 @@ class LexerTest {
     @MethodSource("provideStringsForNumberTokenChecks")
     void nextTokenReadNumberToken(String stringForReader, Class expectedToken) {
         StringReader stringReader = new StringReader(stringForReader);
-        CharactersReaderSimple charReader = new CharactersReaderSimple(stringReader);
-        Lexer lexer = new Lexer(charReader);
+        ReaderChars readerChars = new ReaderChars(stringReader);
+        Lexer lexer = new Lexer(readerChars);
         Token currentToken = lexer.nextToken();
         assertEquals(expectedToken, currentToken.getClass());
     }
@@ -72,8 +72,8 @@ class LexerTest {
     @Test
     void nextTokenReadStringToken() {
         StringReader stringReader = new StringReader("\"ha\" \"bla\" foo");
-        CharactersReaderSimple charReader = new CharactersReaderSimple(stringReader);
-        Lexer lexer = new Lexer(charReader);
+        ReaderChars readerChars = new ReaderChars(stringReader);
+        Lexer lexer = new Lexer(readerChars);
         Token currentToken;
 
         currentToken = lexer.nextToken();

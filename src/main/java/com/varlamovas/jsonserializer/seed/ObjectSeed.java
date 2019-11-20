@@ -3,10 +3,11 @@ package com.varlamovas.jsonserializer.seed;
 import com.varlamovas.jsonserializer.FieldRetriever;
 import com.varlamovas.jsonserializer.adapters.AdapterFactory;
 import com.varlamovas.jsonserializer.adapters.ObjectAdapter;
+import com.varlamovas.jsonserializer.annotations.CustomAdapter;
+import com.varlamovas.jsonserializer.annotations.CustomName;
 import com.varlamovas.jsonserializer.exceptions.MalformedJSONException;
 import com.varlamovas.jsonserializer.tokens.Token;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -44,12 +45,28 @@ public class ObjectSeed extends JSONObject {
     }
 
     public Field getField(String name) {
-        List<Field> findedField = allFields.stream().filter(f -> f.getName().equals(name)).collect(Collectors.toList());
-        for (Field field : findedField) {
-            Annotation[] annotations = field.getAnnotations();
-            AnnotatedType annotatedType = field.getAnnotatedType();
-            Annotation[] declaredAnnotations = field.getDeclaredAnnotations();
+
+        // CustomName handler
+        List<Field> customNameAnnotatedFields = allFields.stream()
+                .filter(f -> f.isAnnotationPresent(CustomName.class))
+                .collect(Collectors.toList());
+        if (customNameAnnotatedFields.size() != 0) {
+            CustomName ann;
+            String nameByAnn;
+            for (Field field : customNameAnnotatedFields) {
+                ann = field.getAnnotation(CustomName.class);
+                nameByAnn = ann.name();
+                if (nameByAnn.equals(name)) {
+                    return field;
+                }
+            }
         }
+
+
+
+        List<Field> findedField = allFields.stream()
+                .filter(f -> f.getName().equals(name))
+                .collect(Collectors.toList());
         if (findedField.isEmpty()) {
             //TODO: Think about it exception
             throw new MalformedJSONException("No one field were found by the name: " + name);
@@ -79,13 +96,26 @@ public class ObjectSeed extends JSONObject {
 //        }
 //        propMapSimple.put(propertyName, token);
         Field field = getField(propertyName);
+        field.setAccessible(true);
+
         if (Modifier.isTransient(field.getModifiers())) {
             return;
         }
         if (field.getType().isPrimitive()) {
             AdapterFactory.getPrimitiveAdapter().fromJson(field, instance, token);
         } else {
-            ObjectAdapter adapter = AdapterFactory.getAdapter(field.getType());
+            ObjectAdapter<?> adapter = AdapterFactory.getAdapter(field.getType());
+            if (adapter == null) {
+                assert field.isAnnotationPresent(CustomAdapter.class);
+                CustomAdapter annotation = field.getAnnotation(CustomAdapter.class);
+
+                try {
+                    adapter = annotation.adapterClass().newInstance();
+                } catch (InstantiationException | IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            }
+
             assert adapter != null;
             Object obj = adapter.fromJson(token);
             FieldRetriever.setFieldObject(field, instance, obj);

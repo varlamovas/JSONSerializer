@@ -11,6 +11,7 @@ public class ReaderChars {
 
     private StringReader reader;
     private IntBuffer intBuffer;
+    private boolean eof = false;
 
     public ReaderChars(StringReader reader) {
         this.reader = reader;
@@ -18,6 +19,9 @@ public class ReaderChars {
     }
 
     public int readNext() {
+//        if (eof) {
+//            return -1;
+//        }
         int next;
         if (intBuffer.isNotEmpty()) {
             next = intBuffer.poll();
@@ -30,6 +34,9 @@ public class ReaderChars {
     public int peekNext() {
         int peeked = readNext();
         intBuffer.add(peeked);
+//        if (eof) {
+//            return -1;
+//        }
         return peeked;
     }
 
@@ -42,6 +49,7 @@ public class ReaderChars {
             throw new MalformedJSONException("IO exception can be catched", e.getCause());
         }
         if (ch == -1) {
+//            eof = true;
             return -1;
         }
         return ch;
