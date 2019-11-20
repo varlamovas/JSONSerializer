@@ -76,6 +76,7 @@ public class MapSeed extends JSONObject {
         return instance;
     }
 
+    @SuppressWarnings("unchecked")
     private Map<Object, Object> newInstance() {
         instance = null;
         if (clazz.isInterface()) {

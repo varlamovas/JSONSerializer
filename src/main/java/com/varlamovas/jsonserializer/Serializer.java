@@ -1,8 +1,8 @@
 package com.varlamovas.jsonserializer;
 
-import com.varlamovas.jsonserializer.adapters.AdapterFactory;
-import com.varlamovas.jsonserializer.adapters.ObjectAdapter;
-import com.varlamovas.jsonserializer.adapters.PrimitiveAdapter;
+import com.varlamovas.jsonserializer.adapters.*;
+import com.varlamovas.jsonserializer.annotations.CustomAdapter;
+import com.varlamovas.jsonserializer.annotations.CustomName;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
@@ -59,9 +59,9 @@ class Serializer {
     private void parsePropertyValue(final Field field, final Object instanceWithField) {
 
         if (field.getDeclaringClass().isPrimitive()) {
-            withQuotes(field::getName);
-
-            jsonBuilder.append(":");
+//            withQuotes(field::getName);
+            withQuotes(() -> getFieldName(field));
+            jsonBuilder.append(Serializer.COLON);
             parsePrimitiveItem(field, instanceWithField);
             return;
         }
@@ -72,8 +72,23 @@ class Serializer {
             return;
         }
 
-        withQuotes(field::getName);
+//        withQuotes(field::getName);
+        withQuotes(() -> getFieldName(field));
         jsonBuilder.append(Serializer.COLON);
+
+        if (field.isAnnotationPresent(CustomAdapter.class)) {
+            CustomAdapter annotation = field.getAnnotation(CustomAdapter.class);
+            SimpleObjectAdapter adapter = null;
+            try {
+                adapter = annotation.adapterClass().newInstance();
+            } catch (InstantiationException | IllegalAccessException e) {
+                e.printStackTrace();
+            }
+            assert adapter != null;
+            parseItemByCustomAdapter(fieldObject, adapter);
+            return;
+        }
+
         parseItem(fieldObject);
 
     }
@@ -84,10 +99,16 @@ class Serializer {
 
     }
 
+    private void parseItemByCustomAdapter(Object item, SimpleObjectAdapter adapter) {
+        withQuotes(() -> adapter.toJson(item));
+    }
+
     private void parseItem(final Object item) {
 
         Class clazz = item.getClass();
-        ObjectAdapter adapter = AdapterFactory.getAdapter(item);
+        ObjectAdapter adapter;
+        adapter = AdapterFactory.getAdapter(item);
+
         if (adapter != null) {
             jsonBuilder.append(adapter.toJson(item));
             return;
@@ -128,10 +149,9 @@ class Serializer {
         });
     }
 
-    @SuppressWarnings("Suppress unchecked cast")
     private void parseMapType(final Object mapTypeObject) {
         withCirclyBrackets(() -> {
-            Map<Object, Object> map = (Map<Object, Object>) mapTypeObject;
+            @SuppressWarnings("unchecked") Map<Object, Object> map = (Map<Object, Object>) mapTypeObject;
             for (Map.Entry<Object, Object> entry : map.entrySet()) {
                 tryComma();
                 withQuotes(entry.getKey()::toString);
@@ -176,4 +196,14 @@ class Serializer {
         expectColon = true;
     }
 
+    private String getFieldName(Field field) {
+        String name;
+        if (field.isAnnotationPresent(CustomName.class)) {
+            CustomName annotation = field.getAnnotation(CustomName.class);
+            name = annotation.name();
+        } else {
+            name = field.getName();
+        }
+        return name;
+    }
 }

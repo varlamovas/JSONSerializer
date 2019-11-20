@@ -1,12 +1,8 @@
 package com.varlamovas.jsonserializer.adapters;
 
-import com.varlamovas.jsonserializer.FieldRetriever;
-import com.varlamovas.jsonserializer.exceptions.MalformedJSONException;
 import com.varlamovas.jsonserializer.tokens.FloatToken;
 import com.varlamovas.jsonserializer.tokens.IntegerToken;
 import com.varlamovas.jsonserializer.tokens.Token;
-
-import java.lang.reflect.Field;
 
 public class NumberAdapter implements ObjectAdapter<Number> {
 

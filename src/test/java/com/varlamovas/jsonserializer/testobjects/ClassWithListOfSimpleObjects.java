@@ -1,7 +1,6 @@
 package com.varlamovas.jsonserializer.testobjects;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class ClassWithListOfSimpleObjects implements BaseObject {
     public ArrayList<SimpleObject> listOfSimpleObjects;

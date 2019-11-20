@@ -3,7 +3,6 @@ package com.varlamovas.jsonserializer;
 import com.google.gson.Gson;
 import com.varlamovas.jsonserializer.testobjects.BigNestedStructure;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 

@@ -24,6 +24,7 @@ public class CollectionSeed extends JSONArray {
         this.instance = newInstance();
     }
 
+    @SuppressWarnings("unchecked")
     public Collection<Object> newInstance() {
         instance = null;
         Constructor<?>[] constructors = clazz.getConstructors();

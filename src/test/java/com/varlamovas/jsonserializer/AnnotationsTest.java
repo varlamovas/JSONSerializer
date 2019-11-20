@@ -1,46 +1,62 @@
 package com.varlamovas.jsonserializer;
 
+import com.varlamovas.jsonserializer.annotations.CustomAdapter;
 import com.varlamovas.jsonserializer.annotations.CustomName;
-import com.varlamovas.jsonserializer.testobjects.ClassWithAnotatedField;
+import com.varlamovas.jsonserializer.testobjects.LocalDateAdapter;
 import org.junit.jupiter.api.Test;
-import org.junit.platform.commons.util.ReflectionUtils;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.AnnotatedType;
-import java.lang.reflect.Field;
-import java.util.Date;
+import java.time.LocalDate;
+import java.util.Objects;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class AnnotationsTest {
 
     @Test
-    void annotationsTest() {
-        ClassWithAnotatedField instance = new ClassWithAnotatedField();
-        Field[] declaredFields = instance.getClass().getDeclaredFields();
-        Field declaredField = declaredFields[0];
-        Annotation[] declaredAnnotations = declaredField.getDeclaredAnnotations();
-        Annotation[] annotations = declaredField.getAnnotations();
-        AnnotatedType annotatedType = declaredField.getAnnotatedType();
+    void annotationsTest__CustomName__serialize() {
+        JsonSerializer jsonSerializer = new JsonSerializer();
+        ClassWithCustomName instance = ClassWithCustomName.getInstance();
 
-        if (declaredField.isAnnotationPresent(CustomName.class)) {
-            CustomName ann = declaredField.getAnnotation(CustomName.class);
-            String nmae= ann.name();
-            System.out.println(nmae);
-        }
+        String json = jsonSerializer.serialize(instance);
+        assertEquals(ClassWithCustomName.getJson(), json);
+    }
 
-        Annotation annotation = annotations[0];;
+    @Test
+    void annotationTest__CustomName__deserialize() {
+        JsonSerializer jsonSerializer = new JsonSerializer();
+        ClassWithCustomName instance = ClassWithCustomName.getInstance();
+        String json = jsonSerializer.serialize(instance);
 
-        JsonSerializer js = new JsonSerializer();
+        ClassWithCustomName deserialized = jsonSerializer.deserialize(json, ClassWithCustomName.class);
+        assertEquals(instance, deserialized);
 
-        ClassWithDateField inst = ClassWithDateField.getInstance();
-        String json = js.serialize(inst);
-        System.out.println(json);
+    }
 
+
+    @Test
+    void test__CustomAdapter__serialize() {
+        JsonSerializer serializer = new JsonSerializer();
+        ClassWithDateField instance = ClassWithDateField.getInstance();
+        String json = serializer.serialize(instance);
+
+        assertEquals(ClassWithDateField.getJson(), json);
+    }
+
+    @Test
+    void test__CustomAdapter__deserialize() {
+        JsonSerializer serializer = new JsonSerializer();
+        ClassWithDateField instance = ClassWithDateField.getInstance();
+        String json = serializer.serialize(instance);
+        ClassWithDateField deserialized = serializer.deserialize(json, ClassWithDateField.class);
+
+        assertEquals(instance, deserialized);
     }
 }
 
 class ClassWithDateField {
 
-    @CustomName(name = "bla") String datefield;
+    @CustomAdapter(adapterClass = LocalDateAdapter.class)
+    LocalDate date;
 
     public static ClassWithDateField getInstance() {
         ClassWithDateField instance = new ClassWithDateField();
@@ -48,7 +64,57 @@ class ClassWithDateField {
         return instance;
     }
 
+    public static String getJson() {
+        return "{\"date\":\"15.08.94\"}";
+    }
+
+    private void setFields() {
+        date = LocalDate.of(1994, 8, 15);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (null == obj || getClass() != obj.getClass()) return false;
+        ClassWithDateField that = (ClassWithDateField) obj;
+        return date.equals(that.date);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(date);
+    }
+}
+
+class ClassWithCustomName {
+
+    @CustomName(name = "bla")
+    String datefield;
+
+    public static ClassWithCustomName getInstance() {
+        ClassWithCustomName instance = new ClassWithCustomName();
+        instance.setFields();
+        return instance;
+    }
+
+    public static String getJson() {
+        return "{\"bla\":\"fooFoo\"}";
+    }
+
     private void setFields() {
         datefield = "fooFoo";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ClassWithCustomName that = (ClassWithCustomName) o;
+        return Objects.equals(datefield, that.datefield);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(datefield);
     }
 }
